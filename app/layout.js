@@ -1,10 +1,12 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import Footer from "./components/footer";
 
 import BootstrapScripts from "./components/BootstrapScripts";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Navarbar from "./components/Navarbar";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -27,6 +29,8 @@ export default function RootLayout({ children }) {
         <Navarbar />
         <BootstrapScripts />
         {children}
+
+        <Footer />
       </body>
     </html>
   );
