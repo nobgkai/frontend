@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-export default function Navar(){
+export default function About(){
     return(
         <>
-            
+        
         </>
     );
 }
