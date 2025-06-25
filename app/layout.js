@@ -2,7 +2,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Footer from "./components/footer";
-
 import BootstrapScripts from "./components/BootstrapScripts";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Navarbar from "./components/Navarbar";
@@ -27,9 +26,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <Navarbar />
-        <BootstrapScripts />
-        {children}
 
+        {children}
+        <BootstrapScripts />
         <Footer />
       </body>
     </html>
