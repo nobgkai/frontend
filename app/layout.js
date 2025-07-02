@@ -14,7 +14,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="th" className={sarabun.variable}>
+    <html lang="en">
       <body>
         <div className="container-fluid">
           <Navarbar />
