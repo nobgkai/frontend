@@ -3,6 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-geist: "Geist", sans-serif;
+  --font-geist-mono: "Geist Mono", monospace;
 }
 
 @theme inline {
@@ -21,4 +23,12 @@
 
 body {
   font-family: "Prompt", "Inter", sans-serif;
+}
+
+.font-geist {
+  font-family: var(--font-geist), sans-serif;
+}
+
+.font-geist-mono {
+  font-family: var(--font-geist-mono), monospace;
 }

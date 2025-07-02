@@ -25,3 +25,16 @@
     transform: translateY(0);
   }
 }
+
+/*ตกแต่ง fony*/
+.heading {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #333; /* สีเทาเข้ม */
+  letter-spacing: 0.05em;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-family: "Sarabun", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding-bottom: 0.3rem;
+  transition: color 0.3s ease;
+}

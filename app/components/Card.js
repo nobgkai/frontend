@@ -5,7 +5,7 @@ export default function Card() {
   return (
     <>
       <div className="container py-5">
-        <h2 className="text-center mb-4">การ์ดตัวอย่าง 3 ใบ</h2>
+        <h2 className="heading text-center mb-4 ">การ์ดตัวอย่าง 3 ใบ</h2>
         <div className="row">
           {/* Card 1 */}
           <div className="col-md-4 mb-4">

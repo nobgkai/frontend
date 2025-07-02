@@ -6,14 +6,16 @@ import BootstrapScripts from "./components/BootstrapScripts";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Navarbar from "./components/Navarbar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const geist = Geist({
   subsets: ["latin"],
+  weight: "400",
+  variable: "--font-geist",
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
+  weight: "400",
+  variable: "--font-geist-mono",
 });
 
 export const metadata = {
@@ -23,7 +25,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
       <body>
         <div className="container-fluid">
           <Navarbar />
