@@ -25,11 +25,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <Navarbar />
+        <div className="container-fluid">
+          <Navarbar />
 
-        {children}
-        <BootstrapScripts />
-        <Footer />
+          {children}
+          <BootstrapScripts />
+          <Footer />
+        </div>
       </body>
     </html>
   );
