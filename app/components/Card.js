@@ -4,13 +4,22 @@ import "./Card.css";
 export default function Card() {
   return (
     <>
-      <div className="position-relative p-5 text-center text-muted bg-body border border-dashed rounded-5 mt-5 ">
-        <h1 className="heading text-body-emphasis">ผลไม้ 3 ชนิด</h1>
+      <div
+        className="position-relative p-5 text-center text-muted bg-body border border-dashed rounded-5 mt-5 "
+        data-aos="flip-left"
+      >
+        <h1 className="heading text-body-emphasis" data-aos="zoom-in">
+          ผลไม้ 3 ชนิด
+        </h1>
       </div>
       <div className="container py-5">
         <div className="row">
           {/* Card 1 */}
-          <div className="col-md-4 mb-4 ">
+          <div
+            className="col-md-4 mb-4 "
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
             <div className="card h-100 shadow-sm">
               <Image
                 src="/img/b1.png"
@@ -27,7 +36,11 @@ export default function Card() {
           </div>
 
           {/* Card 2 */}
-          <div className="col-md-4 mb-4">
+          <div
+            className="col-md-4 mb-4"
+            data-aos="fade-up"
+            data-aos-delay="300"
+          >
             <div className="card h-100 shadow-sm">
               <Image
                 src="/img/b2.png"
@@ -44,7 +57,11 @@ export default function Card() {
           </div>
 
           {/* Card 3 */}
-          <div className="col-md-4 mb-4">
+          <div
+            className="col-md-4 mb-4"
+            data-aos="fade-up"
+            data-aos-delay="500"
+          >
             <div className="card h-100 shadow-sm">
               <Image
                 src="/img/b3.png"

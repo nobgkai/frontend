@@ -1,5 +1,5 @@
 "use client"; // ถ้าใช้ App Router
-
+import "../components/from.css";
 import React, { useState } from "react";
 
 export default function ContactPage() {
@@ -16,7 +16,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="container py-5">
+    <div className="container pt-5 mt-5 ">
       <div className="row justify-content-center">
         <div className="col-md-8">
           <h2 className="mb-4 text-center">Contact Us</h2>
