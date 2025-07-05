@@ -1,12 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
+import "./navar.css";
 
 export default function Navbar() {
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary">
+    <nav className="navbar navbar-expand-lg custom-navbar shadow">
       <div className="container-fluid">
-        <a className="navbar-brand" href="#">
-          Navbar
+        <a className="navbar-brand fw-bold text-white" href="#">
+          ผลไม้บ้าน
         </a>
         <button
           className="navbar-toggler"
@@ -22,34 +23,34 @@ export default function Navbar() {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#">
+              <a className="nav-link custom-nav-link" href="/">
                 Home
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">
-                Link
+              <a className="nav-link custom-nav-link" href="../about">
+                About
               </a>
             </li>
             <li className="nav-item dropdown">
               <a
-                className="nav-link dropdown-toggle"
+                className="nav-link dropdown-toggle custom-nav-link"
                 href="#"
                 role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                Dropdown
+                Recommend
               </a>
-              <ul className="dropdown-menu">
+              <ul className="dropdown-menu custom-dropdown">
                 <li>
-                  <a className="dropdown-item" href="#">
-                    Action
+                  <a className="dropdown-item" href="../service">
+                    Service
                   </a>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
-                    Another action
+                  <a className="dropdown-item" href="../contact">
+                    Contact
                   </a>
                 </li>
                 <li>
@@ -62,11 +63,6 @@ export default function Navbar() {
                 </li>
               </ul>
             </li>
-            <li className="nav-item">
-              <a className="nav-link disabled" aria-disabled="true">
-                Disabled
-              </a>
-            </li>
           </ul>
           <form className="d-flex" role="search">
             <input
@@ -75,7 +71,7 @@ export default function Navbar() {
               placeholder="Search"
               aria-label="Search"
             />
-            <button className="btn btn-outline-success" type="submit">
+            <button className="btn custom-btn" type="submit">
               Search
             </button>
           </form>

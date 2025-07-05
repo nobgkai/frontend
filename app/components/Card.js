@@ -4,25 +4,24 @@ import "./Card.css";
 export default function Card() {
   return (
     <>
+      <div className="position-relative p-5 text-center text-muted bg-body border border-dashed rounded-5 mt-5 ">
+        <h1 className="heading text-body-emphasis">ผลไม้ 3 ชนิด</h1>
+      </div>
       <div className="container py-5">
-        <h2 className="heading text-center mb-4 ">การ์ดตัวอย่าง 3 ใบ</h2>
         <div className="row">
           {/* Card 1 */}
-          <div className="col-md-4 mb-4">
+          <div className="col-md-4 mb-4 ">
             <div className="card h-100 shadow-sm">
               <Image
-                src="/img/5.jpg"
+                src="/img/b1.png"
                 alt="ภาพ 1"
                 width={500}
                 height={300}
                 layout="responsive"
                 className="card-img-top"
               />
-              <div className="card-body">
-                <h5 className="card-title">การ์ดใบที่ 1</h5>
-                <p className="card-text">
-                  นี่คือข้อความในการ์ดใบแรก ใช้สำหรับแสดงตัวอย่างเนื้อหา.
-                </p>
+              <div className="card-body text-center ">
+                <button className="minimal-btn">ดูเพิ่มเติม</button>
               </div>
             </div>
           </div>
@@ -31,18 +30,15 @@ export default function Card() {
           <div className="col-md-4 mb-4">
             <div className="card h-100 shadow-sm">
               <Image
-                src="/img/6.jpg"
+                src="/img/b2.png"
                 alt="ภาพ 2"
                 width={500}
                 height={300}
                 layout="responsive"
                 className="card-img-top"
               />
-              <div className="card-body">
-                <h5 className="card-title">การ์ดใบที่ 2</h5>
-                <p className="card-text">
-                  เนื้อหาในการ์ดใบที่สองมีความน่าสนใจ และมีประโยชน์มาก.
-                </p>
+              <div className="card-body text-center ">
+                <button className="minimal-btn">ดูเพิ่มเติม</button>
               </div>
             </div>
           </div>
@@ -51,18 +47,15 @@ export default function Card() {
           <div className="col-md-4 mb-4">
             <div className="card h-100 shadow-sm">
               <Image
-                src="/img/7.jpg"
+                src="/img/b3.png"
                 alt="ภาพ 3"
                 width={500}
                 height={300}
                 layout="responsive"
                 className="card-img-top"
               />
-              <div className="card-body">
-                <h5 className="card-title">การ์ดใบที่ 3</h5>
-                <p className="card-text">
-                  ข้อความในใบสุดท้ายนี้อาจเป็นรายละเอียดของผลิตภัณฑ์หรือบริการ.
-                </p>
+              <div className="card-body text-center ">
+                <button className="minimal-btn">ดูเพิ่มเติม</button>
               </div>
             </div>
           </div>

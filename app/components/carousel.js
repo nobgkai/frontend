@@ -1,18 +1,38 @@
 import Link from "next/link";
 import Image from "next/image";
+
 export default function Carousel() {
   return (
     <>
-      <div id="carouselExample" className="carousel slide">
-        <div className="carousel-inner">
+      <div
+        id="carouselExample"
+        className="carousel slide"
+        style={{ height: "100%", overflow: "hidden" }}
+      >
+        <div className="carousel-inner" style={{ height: "100%" }}>
           <div className="carousel-item active">
-            <img src="./img/pig1.png" className="d-block w-100" alt="..." />
+            <img
+              src="./img/fruit/bg1.png"
+              className="d-block w-100"
+              alt="..."
+              style={{ objectFit: "cover", height: "100%" }}
+            />
           </div>
-          <div className="carousel-item">
-            <img src="./img/pig2.png" className="d-block w-100" alt="..." />
+          <div className="carousel-item" style={{ height: "100%" }}>
+            <img
+              src="./img/fruit/bg2.png"
+              className="d-block w-100"
+              alt="..."
+              style={{ objectFit: "cover", height: "100%" }}
+            />
           </div>
-          <div className="carousel-item">
-            <img src="./img/pig3.png" className="d-block w-100" alt="..." />
+          <div className="carousel-item" style={{ height: "100" }}>
+            <img
+              src="./img/fruit/bg3.png"
+              className="d-block w-100"
+              alt="..."
+              style={{ objectFit: "cover", height: "100%" }}
+            />
           </div>
         </div>
         <button
