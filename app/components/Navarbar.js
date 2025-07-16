@@ -75,6 +75,15 @@ export default function Navbar() {
               Search
             </button>
           </form>
+
+          <Link href="./login1" passHref>
+            <button
+              className="btn custom-btn-login ms-lg-3 w-100 w-lg-auto mt-3 mt-lg-0 "
+              type="button"
+            >
+              Login
+            </button>
+          </Link>
         </div>
       </div>
     </nav>
