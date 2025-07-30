@@ -1,6 +1,55 @@
+"use client";
+import React, { useState } from "react";
 import "./register.css";
 
 export default function Register() {
+  const [formData, setFormData] = useState({
+    firstname: "",
+    fullname: "", // ชื่อเต็ม
+    lastname: "",
+    username: "",
+    password: "",
+    address: "",
+    sex: "",
+    birthday: "",
+    agree: false, // เพิ่มตรงนี้
+  });
+
+  const handleChange = (e) => {
+    const { id, value, name, type, checked } = e.target;
+    const field = name || id;
+    const val = type === "checkbox" ? checked : value;
+
+    setFormData((prev) => ({
+      ...prev,
+      [field]: val,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch("http://itdev.cmtc.ac.th:3000/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        alert("สมัครสมาชิกสำเร็จ 🎉");
+        console.log(result);
+      } else {
+        alert("เกิดข้อผิดพลาด: " + result.message);
+      }
+    } catch (err) {
+      alert("ไม่สามารถเชื่อมต่อ API ได้");
+      console.error(err);
+    }
+  };
   return (
     <div className="container mt-5">
       <div
@@ -13,7 +62,7 @@ export default function Register() {
               สมัครสมาชิก
             </h2>
 
-            <form>
+            <form onSubmit={handleSubmit}>
               {/* Username */}
               <div className="mb-3">
                 <label htmlFor="username" className="form-label text-dark">
@@ -25,6 +74,8 @@ export default function Register() {
                   id="username"
                   placeholder="ชื่อผู้ใช้"
                   required
+                  value={formData.username}
+                  onChange={handleChange}
                   style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 />
               </div>
@@ -40,6 +91,8 @@ export default function Register() {
                   id="password"
                   placeholder="รหัสผ่าน"
                   required
+                  value={formData.password}
+                  onChange={handleChange}
                   style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 />
               </div>
@@ -50,29 +103,33 @@ export default function Register() {
                   คำนำหน้าชื่อ
                 </label>
                 <select
-                  id="prefix"
+                  id="firstname"
                   className="form-select"
                   required
+                  value={formData.firstname}
+                  onChange={handleChange}
                   style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 >
                   <option value="">-- เลือก --</option>
-                  <option value="mr">นาย</option>
-                  <option value="ms">นางสาว</option>
-                  <option value="mrs">นาง</option>
+                  <option value="นาย">นาย</option>
+                  <option value="นาง">นาง</option>
+                  <option value="นางสาว">นางสาว</option>
                 </select>
               </div>
 
               {/* ชื่อ */}
               <div className="mb-3">
-                <label htmlFor="firstname" className="form-label text-dark">
+                <label htmlFor="fullname" className="form-label text-dark">
                   ชื่อ
                 </label>
                 <input
                   type="text"
                   className="form-control"
-                  id="firstname"
+                  id="fullname"
                   placeholder="ชื่อจริง"
                   required
+                  value={formData.fullname}
+                  onChange={handleChange}
                   style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 />
               </div>
@@ -88,6 +145,8 @@ export default function Register() {
                   id="lastname"
                   placeholder="นามสกุล"
                   required
+                  value={formData.lastname}
+                  onChange={handleChange}
                   style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 />
               </div>
@@ -103,6 +162,8 @@ export default function Register() {
                   rows="3"
                   placeholder="ที่อยู่ปัจจุบัน"
                   required
+                  value={formData.address}
+                  onChange={handleChange}
                   style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 ></textarea>
               </div>
@@ -114,9 +175,11 @@ export default function Register() {
                   <input
                     className="form-check-input"
                     type="radio"
-                    name="gender"
+                    name="sex"
                     id="male"
-                    value="male"
+                    value="ผู้ชาย"
+                    checked={formData.sex === "ผู้ชาย"}
+                    onChange={handleChange}
                     required
                   />
                   <label className="form-check-label" htmlFor="male">
@@ -127,9 +190,11 @@ export default function Register() {
                   <input
                     className="form-check-input"
                     type="radio"
-                    name="gender"
+                    name="sex"
                     id="female"
-                    value="female"
+                    value="ผู้หญิง"
+                    checked={formData.sex === "ผู้หญิง"}
+                    onChange={handleChange}
                   />
                   <label className="form-check-label" htmlFor="female">
                     หญิง
@@ -145,8 +210,10 @@ export default function Register() {
                 <input
                   type="date"
                   className="form-control"
-                  id="birthdate"
+                  id="birthday"
                   required
+                  value={formData.birthday}
+                  onChange={handleChange}
                   style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 />
               </div>
@@ -158,6 +225,8 @@ export default function Register() {
                   type="checkbox"
                   id="agree"
                   required
+                  checked={formData.agree}
+                  onChange={handleChange}
                 />
                 <label className="form-check-label text-dark " htmlFor="agree">
                   ฉันยอมรับเงื่อนไขและข้อตกลงการใช้งาน
