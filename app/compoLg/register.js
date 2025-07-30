@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import "./register.css";
 
 export default function Register() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     firstname: "",
     fullname: "", // ชื่อเต็ม
@@ -41,7 +43,7 @@ export default function Register() {
       const result = await res.json();
       if (res.ok) {
         alert("สมัครสมาชิกสำเร็จ 🎉");
-        console.log(result);
+        router.push("/login1"); // ✅ พาไปหน้า Login
       } else {
         alert("เกิดข้อผิดพลาด: " + result.message);
       }

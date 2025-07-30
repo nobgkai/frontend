@@ -24,59 +24,88 @@ export default function User1() {
     const interval = setInterval(getUsers, 1000);
     return () => clearInterval(interval);
   }, []);
+  const handleDelete = async (id) => {
+    if (!confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) return;
 
+    try {
+      const res = await fetch(`http://itdev.cmtc.ac.th:3000/api/users/${id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        alert("ลบข้อมูลเรียบร้อยแล้ว");
+        // อัปเดตหน้าโดยเอาผู้ใช้ที่ถูกลบออกจาก state
+        setItems((prev) => prev.filter((item) => item.id !== id));
+      } else {
+        const error = await res.json();
+        alert("เกิดข้อผิดพลาด: " + error.message);
+      }
+    } catch (err) {
+      alert("ไม่สามารถเชื่อมต่อ API ได้");
+      console.error(err);
+    }
+  };
   return (
     <>
-      <br />
-      <br />
-      <br />
-      <br />
-      <div className="container">
-        <div className="card">
-          <div className="card-header">Users List</div>
+      <div className="container " style={{ marginTop: "100px" }}>
+        <div className="card shadow">
+          <div className="card-header bg-primary text-white fs-5 fw-bold">
+            รายชื่อผู้ใช้
+          </div>
           <div className="card-body">
-            <div className="row">
-              <table className="table table-striped table-hover">
-                <thead>
+            <div className="table-responsive">
+              <table className="table table-bordered table-striped table-hover align-middle text-center">
+                <thead className="table-dark">
                   <tr>
-                    <th className="col-md-2 text-center">#</th>
-                    <th className="col-md-4">Firstname</th>
-                    <th className="col-md-4">Fullname</th>
-                    <th className="col-md-4">Lastname</th>
-                    <th className="col-md-1">Eidt</th>
-                    <th className="col-md-1">Delete</th>
+                    <th>#</th>
+                    <th>คำนำหน้า</th>
+                    <th>ชื่อ</th>
+                    <th>นามสกุล</th>
+                    <th>ชื่อเล่น</th>
+                    <th>แก้ไข</th>
+                    <th>ลบ</th>
                   </tr>
                 </thead>
                 <tbody>
                   {items.map((item) => (
                     <tr key={item.id}>
-                      <td className="text-center">{item.id}</td>
+                      <td>{item.id}</td>
                       <td>{item.firstname}</td>
                       <td>{item.fullname}</td>
                       <td>{item.lastname}</td>
+                      <td>{item.username}</td>
                       <td>
-                        <Link href="" className="btn btn-warning">
-                          Edit
+                        <Link
+                          href={`/edit/${item.id}`}
+                          className="btn btn-sm btn-warning"
+                        >
+                          แก้ไข
                         </Link>
                       </td>
                       <td>
                         <button
-                          className="btn btn-pill btn-danger"
-                          type="button"
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleDelete(item.id)}
                         >
-                          <i className="fa fa-trash"></i>Del
+                          <i className="fa fa-trash"></i>
+                          ลบ
                         </button>
                       </td>
                     </tr>
                   ))}
+                  {items.length === 0 && (
+                    <tr>
+                      <td colSpan="7" className="text-center text-muted">
+                        ไม่พบข้อมูล
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
       </div>
-      <br />
-      <br />
     </>
   );
 }
