@@ -1,20 +1,22 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+import { registerUser } from "../api/register2/route"; // ปรับเส้นทางให้ตรงกับที่คุณเก็บฟังก์ชันนี้
 import "./register.css";
 
 export default function Register() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     firstname: "",
-    fullname: "", // ชื่อเต็ม
+    fullname: "",
     lastname: "",
     username: "",
     password: "",
     address: "",
     sex: "",
     birthday: "",
-    agree: false, // เพิ่มตรงนี้
+    agree: false,
   });
 
   const handleChange = (e) => {
@@ -32,26 +34,23 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://itdev.cmtc.ac.th:3000/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      await registerUser(formData);
+      await Swal.fire({
+        icon: "success",
+        title: "สมัครสมาชิกสำเร็จ!",
+        text: "คุณสามารถเข้าสู่ระบบได้ทันที",
+        confirmButtonText: "ตกลง",
+        timer: 3000,
+        timerProgressBar: true,
+      }).then(() => {
+        router.push("");
       });
-
-      const result = await res.json();
-      if (res.ok) {
-        alert("สมัครสมาชิกสำเร็จ 🎉");
-        router.push("/login1"); // ✅ พาไปหน้า Login
-      } else {
-        alert("เกิดข้อผิดพลาด: " + result.message);
-      }
     } catch (err) {
-      alert("ไม่สามารถเชื่อมต่อ API ได้");
+      alert("เกิดข้อผิดพลาด: " + err.message);
       console.error(err);
     }
   };
+
   return (
     <div className="container mt-5">
       <div
@@ -65,6 +64,7 @@ export default function Register() {
             </h2>
 
             <form onSubmit={handleSubmit}>
+              {/* โค้ดฟอร์มเหมือนที่คุณส่งมา */}
               {/* Username */}
               <div className="mb-3">
                 <label htmlFor="username" className="form-label text-dark">
@@ -181,8 +181,12 @@ export default function Register() {
                     id="male"
                     value="ผู้ชาย"
                     checked={formData.sex === "ผู้ชาย"}
-                    onChange={handleChange}
-                    required
+                    onChange={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        sex: prev.sex === "ผู้ชาย" ? "" : "ผู้ชาย",
+                      }));
+                    }}
                   />
                   <label className="form-check-label" htmlFor="male">
                     ชาย
@@ -196,7 +200,12 @@ export default function Register() {
                     id="female"
                     value="ผู้หญิง"
                     checked={formData.sex === "ผู้หญิง"}
-                    onChange={handleChange}
+                    onChange={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        sex: prev.sex === "ผู้หญิง" ? "" : "ผู้หญิง",
+                      }));
+                    }}
                   />
                   <label className="form-check-label" htmlFor="female">
                     หญิง
