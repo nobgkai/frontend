@@ -1,6 +1,7 @@
 "use client";
 import { fetchUsers, deleteUser, updateUser } from "../api/addmin/route"; // ปรับเส้นทางให้ตรงกับที่คุณเก็บฟังก์ชันนี้
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import Edit1 from "../admin2/users/edit/page";
@@ -8,22 +9,40 @@ export default function Admin1() {
   const [items, setItems] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
 
+  const [loading, setLoading] = useState(true); // <-- เพิ่ม state loading
+  const router = useRouter();
+
+  const getToken = () =>
+    (typeof window !== "undefined" &&
+      (localStorage.getItem("token") || sessionStorage.getItem("token"))) ||
+    null;
+
   const loadUsers = async () => {
     try {
       const data = await fetchUsers();
       setItems(data);
     } catch (error) {
       console.error("โหลดข้อมูลล้มเหลว:", error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
+    const token = getToken();
+    if (!token) {
+      router.replace("/login1");
+      return;
+    }
+
     loadUsers();
-    const interval = setInterval(loadUsers, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  }, [router]);
 
   const handleDelete = async (id) => {
+    // ✅ กันเผื่อ: ป้องกันคนเข้าตรง action โดยยังไม่ล็อกอิน
+    const token = getToken();
+    if (!token) return router.replace("/login1");
+
     if (!confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) return;
     try {
       await deleteUser(id);
@@ -35,6 +54,8 @@ export default function Admin1() {
   };
 
   const handleSave = async (updatedUser) => {
+    const token = getToken();
+    if (!token) return router.replace("/login");
     try {
       const updated = await updateUser(updatedUser);
       setItems((prev) =>
@@ -46,7 +67,13 @@ export default function Admin1() {
       alert("เกิดข้อผิดพลาด: " + error.message);
     }
   };
-
+  if (loading) {
+    return (
+      <div className="container" style={{ marginTop: "100px" }}>
+        กำลังโหลด...
+      </div>
+    );
+  }
   return (
     <div className="container" style={{ marginTop: "100px" }}>
       <div className="card shadow">

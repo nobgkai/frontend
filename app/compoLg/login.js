@@ -3,11 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "./login.css";
-
+import Link from "next/link";
 export default function Login({ onLogin }) {
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -16,18 +19,43 @@ export default function Login({ onLogin }) {
   const togglePassword = () => setShowPassword((prev) => !prev);
 
   const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+    const { id, value, type, checked } = e.target;
+    if (id === "rememberMe" && type === "checkbox") {
+      setRemember(checked);
+      return;
+    }
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
+    setSubmitting(true);
 
-    if (onLogin) {
-      onLogin(formData); // ส่งข้อมูลไปให้ parent จัดการ API
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.message || "เข้าสู่ระบบไม่สำเร็จ");
+      }
+
+      // เก็บ token/role ตาม remember me
+      const storage = remember ? localStorage : sessionStorage;
+      storage.setItem("token", data.token);
+      if (data?.role) storage.setItem("role", data.role);
+
+      // ✅ แค่ redirect ไปหน้า admin
+      router.push("/admin");
+    } catch (err) {
+      setErrorMsg(err.message || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -61,7 +89,7 @@ export default function Login({ onLogin }) {
             />
           </div>
 
-          <div className="mb-3 position-relative">
+          <div className="mb-3 ">
             <label htmlFor="password" className="form-label text-dark">
               รหัสผ่าน
             </label>
@@ -102,12 +130,12 @@ export default function Login({ onLogin }) {
                 จำฉันไว้
               </label>
             </div>
-            <a
+            <Link
               href="/forgot-password"
               className="text-decoration-none text-secondary link-hover-effect"
             >
               ลืมรหัสผ่าน?
-            </a>
+            </Link>
           </div>
 
           <button
@@ -133,9 +161,12 @@ export default function Login({ onLogin }) {
                 margin: "0 10px",
               }}
             ></div>
-            <a href="./register1" className="text-dark fw-semibold link-effect">
+            <Link
+              href="/register1"
+              className="text-dark fw-semibold link-effect"
+            >
               สมัครสมาชิก
-            </a>
+            </Link>
           </div>
         </form>
       </div>

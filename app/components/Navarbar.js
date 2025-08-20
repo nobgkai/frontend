@@ -6,9 +6,9 @@ export default function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg custom-navbar shadow">
       <div className="container-fluid">
-        <a className="navbar-brand fw-bold text-white" href="#">
+        <Link href="/" className="navbar-brand fw-bold text-white">
           ผลไม้บ้าน
-        </a>
+        </Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -23,43 +23,43 @@ export default function Navbar() {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <a className="nav-link custom-nav-link" href="/">
+              <Link href="/" className="nav-link custom-nav-link">
                 Home
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link custom-nav-link" href="../about">
+              <Link href="/about" className="nav-link custom-nav-link">
                 About
-              </a>
+              </Link>
             </li>
             <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle custom-nav-link"
+              <Link
                 href="#"
+                className="nav-link dropdown-toggle custom-nav-link"
                 role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
                 Recommend
-              </a>
+              </Link>
               <ul className="dropdown-menu custom-dropdown">
                 <li>
-                  <a className="dropdown-item" href="../service">
+                  <Link href="/service" className="dropdown-item">
                     Service
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="../contact">
+                  <Link href="/contact" className="dropdown-item">
                     Contact
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <hr className="dropdown-divider" />
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link href="#" className="dropdown-item">
                     Something else here
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </li>
@@ -76,9 +76,9 @@ export default function Navbar() {
             </button>
           </form>
 
-          <Link href="./login1" passHref>
+          <Link href="/login1" passHref>
             <button
-              className="btn custom-btn-login ms-lg-3 w-100 w-lg-auto mt-3 mt-lg-0 "
+              className="btn custom-btn-login ms-lg-3 w-100 w-lg-auto mt-3 mt-lg-0"
               type="button"
             >
               Login
