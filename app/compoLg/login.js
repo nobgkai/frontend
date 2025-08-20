@@ -51,7 +51,9 @@ export default function Login({ onLogin }) {
       if (data?.role) storage.setItem("role", data.role);
 
       // ✅ แค่ redirect ไปหน้า admin
-      router.push("/admin");
+      //router.push("/admin");
+
+      window.location.href = "/admin";
     } catch (err) {
       setErrorMsg(err.message || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
     } finally {
