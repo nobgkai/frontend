@@ -1,5 +1,5 @@
 "use client";
-import { fetchUsers, deleteUser, updateUser } from "../api/addmin/route"; // ปรับเส้นทางให้ตรงกับที่คุณเก็บฟังก์ชันนี้
+import { fetchUsers, deleteUser, updateUser } from "@/lib/addminApi"; // ปรับเส้นทางให้ตรงกับที่คุณเก็บฟังก์ชันนี้
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -36,7 +36,7 @@ export default function Admin1() {
     }
 
     loadUsers();
-  }, [router]);
+  }, []);
 
   const handleDelete = async (id) => {
     // ✅ กันเผื่อ: ป้องกันคนเข้าตรง action โดยยังไม่ล็อกอิน
@@ -67,13 +67,13 @@ export default function Admin1() {
       alert("เกิดข้อผิดพลาด: " + error.message);
     }
   };
-  if (loading) {
-    return (
-      <div className="container" style={{ marginTop: "100px" }}>
-        กำลังโหลด...
-      </div>
-    );
-  }
+  //if (loading) {
+  //return (
+  //<div className="container" style={{ marginTop: "100px" }}>
+  //  กำลังโหลด...
+  // </div>
+  // );
+  // }
   return (
     <div className="container" style={{ marginTop: "100px" }}>
       <div className="card shadow">

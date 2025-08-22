@@ -1,7 +1,7 @@
 // app/api/login/route.js
 import { NextResponse } from "next/server";
 
-const USERS_API = "http://itdev.cmtc.ac.th:3000/api/users";
+const USERS_API = "https://backend-nextjs-virid.vercel.app/api/users";
 
 // ถ้ามี bcryptjs จะใช้เทียบ hash ให้; ถ้าไม่มี จะ fallback เป็น null แล้วเทียบแบบ plain-text
 async function getBcrypt() {
