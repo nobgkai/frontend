@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import Edit1 from "../admin2/users/edit/page";
+import Edit11 from "./edit1"; // ปรับเส้นทางให้ตรงกับที่คุณเก็บคอมโพเนนต์นี้
 export default function Admin1() {
   const [items, setItems] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
@@ -55,16 +55,15 @@ export default function Admin1() {
 
   const handleSave = async (updatedUser) => {
     const token = getToken();
-    if (!token) return router.replace("/login");
+    if (!token) return router.replace("/login1");
+
     try {
-      const updated = await updateUser(updatedUser);
-      setItems((prev) =>
-        prev.map((item) => (item.id === updated.id ? updated : item))
-      );
+      const updated = await updateUser(updatedUser); // ยิง /api/admin2/:id ใน addminApi
+      setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
       setEditingUser(null);
       alert("แก้ไขข้อมูลเรียบร้อย");
-    } catch (error) {
-      alert("เกิดข้อผิดพลาด: " + error.message);
+    } catch (err) {
+      alert("เกิดข้อผิดพลาด: " + err.message);
     }
   };
   //if (loading) {
@@ -142,7 +141,7 @@ export default function Admin1() {
       </div>
 
       {editingUser && (
-        <Edit1
+        <Edit11
           user={editingUser}
           onClose={() => setEditingUser(null)}
           onSave={handleSave}

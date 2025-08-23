@@ -1,388 +1,315 @@
-'use client'
+"use client";
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css"; // npm i aos
 
-/**
- * วางคอมโพเนนต์นี้ "ต่อจากส่วนรูป" ที่มีการ์ดผลไม้ของคุณได้เลย
- * ตัวอย่างไฟล์: app/page.jsx หรือส่วนที่ต้องการ
- *
- * <FruitBenefitsSection />
- *
- * ✅ จุดเด่น UI
- * - แถบค้นหา + ตัวกรองตามอาการ/โรคที่สนใจ
- * - การ์ดแสดงประโยชน์หลักและวิตามินเด่น
- * - Modal รายละเอียดแบบเต็ม: สารอาหาร, โรคที่ช่วยชะลอ/ยับยั้ง, ข้อควรระวัง
- * - ปุ่ม "เปรียบเทียบ" ลิสต์ผลไม้ที่เลือกด้านล่างอย่างย่อ
- */
-
-const CONDITIONS = [
-  'สุขภาพหัวใจ',
-  'ความดันโลหิต',
-  'ภูมิคุ้มกัน',
-  'ย่อยอาหาร',
-  'สายตา/ผิวหนัง',
-  'เบาหวานชนิดที่ 2',
-  'ต้านอนุมูลอิสระ',
-]
-
+// --- ข้อมูลผลไม้ 12 ชนิด (Emoji/ไอคอน) ---
 const FRUITS = [
   {
-    id: 'apple',
-    name: 'แอปเปิล',
-    cover: '/img/fruit/apple.jpg',
-    summary:
-      'ไฟเบอร์สูง (เพคติน) ช่วยย่อยอาหาร คอเลสเตอรอล และน้ำตาลในเลือด',
-    vitamins: ['วิตามิน C', 'ไฟเบอร์ (เพคติน)', 'โพลีฟีนอล'],
-    helps: ['สุขภาพหัวใจ', 'เบาหวานชนิดที่ 2', 'ต้านอนุมูลอิสระ'],
-    details: {
-      nutrients: [
-        { k: 'พลังงาน', v: '52 kcal / 100g' },
-        { k: 'ไฟเบอร์', v: '~2.4 g' },
-        { k: 'วิตามิน C', v: '~7% DV' },
-        { k: 'โพลีฟีนอล', v: 'เควอซิติน, คาเทชิน' },
-      ],
-      conditions: [
-        'ช่วยลดคอเลสเตอรอล LDL (ไฟเบอร์เพคติน)',
-        'สนับสนุนสุขภาพหัวใจและหลอดเลือด',
-        'ช่วยคุมระดับน้ำตาลหลังอาหาร',
-      ],
-      caution: 'แพ้ผลไม้ตระกูล Rosaceae ได้ในบางราย; ล้างเปลือกให้สะอาด',
-    },
+    id: "orange",
+    name: "ส้ม",
+    emoji: "🍊",
+    nutrients: ["วิตามิน C", "ไฟเบอร์"],
+    benefits: ["เสริมภูมิคุ้มกัน", "ต้านอนุมูลอิสระ"],
   },
   {
-    id: 'pineapple',
-    name: 'สับปะรด',
-    cover: '/img/fruit/pineapple.jpg',
-    summary: 'มีโบรมีเลนช่วยย่อยโปรตีน ลดอักเสบบางชนิด และวิตามิน C สูง',
-    vitamins: ['โบรมีเลน', 'วิตามิน C', 'แมงกานีส'],
-    helps: ['ย่อยอาหาร', 'ภูมิคุ้มกัน', 'ต้านอนุมูลอิสระ'],
-    details: {
-      nutrients: [
-        { k: 'พลังงาน', v: '50 kcal / 100g' },
-        { k: 'วิตามิน C', v: '~80% DV' },
-        { k: 'แมงกานีส', v: 'สูง' },
-      ],
-      conditions: [
-        'เอนไซม์โบรมีเลนช่วยย่อยโปรตีน ลดอาการท้องอืด',
-        'วิตามิน C ช่วยภูมิคุ้มกันและคอลลาเจน',
-      ],
-      caution: 'ระคายปากได้ถ้าทานดิบมาก; ผู้แพ้โบรมีเลนควรเลี่ยง',
-    },
+    id: "banana",
+    name: "กล้วย",
+    emoji: "🍌",
+    nutrients: ["โพแทสเซียม", "วิตามิน B6"],
+    benefits: ["ช่วยระบบขับถ่าย", "ควบคุมความดันโลหิต"],
   },
   {
-    id: 'banana',
-    name: 'กล้วย',
-    cover: '/img/fruit/banana.jpg',
-    summary: 'แหล่งโพแทสเซียมและวิตามิน B6 ช่วยสมดุลความดันและพลังงาน',
-    vitamins: ['โพแทสเซียม', 'วิตามิน B6', 'ไฟเบอร์'],
-    helps: ['ความดันโลหิต', 'ย่อยอาหาร'],
-    details: {
-      nutrients: [
-        { k: 'พลังงาน', v: '89 kcal / 100g' },
-        { k: 'โพแทสเซียม', v: '~358 mg' },
-        { k: 'วิตามิน B6', v: '~20% DV' },
-      ],
-      conditions: [
-        'โพแทสเซียมช่วยสมดุลโซเดียม สนับสนุนความดันโลหิต',
-        'ไฟเบอร์ละลายน้ำช่วยระบบทางเดินอาหาร',
-      ],
-      caution:
-        'ผู้โรคไตรุนแรงต้องจำกัดโพแทสเซียม; กล้วยสุกจัดมีน้ำตาลสูงกว่า',
-    },
+    id: "apple",
+    name: "แอปเปิล",
+    emoji: "🍎",
+    nutrients: ["ไฟเบอร์เพคติน", "โพลีฟีนอล"],
+    benefits: ["ลดคอเลสเตอรอล", "ควบคุมระดับน้ำตาลในเลือด"],
   },
   {
-    id: 'orange',
-    name: 'ส้ม',
-    cover: '/img/fruit/orange.jpg',
-    summary: 'วิตามิน C สูง ฟลาโวนอยด์ช่วยต้านอนุมูลอิสระ บำรุงผิวและภูมิ',
-    vitamins: ['วิตามิน C', 'ฟลาโวนอยด์', 'ไฟเบอร์ละลายน้ำ'],
-    helps: ['ภูมิคุ้มกัน', 'ต้านอนุมูลอิสระ', 'สุขภาพหัวใจ'],
-    details: {
-      nutrients: [
-        { k: 'พลังงาน', v: '47 kcal / 100g' },
-        { k: 'วิตามิน C', v: '~88% DV' },
-        { k: 'ไฟเบอร์', v: '~2.4 g' },
-      ],
-      conditions: [
-        'ช่วยสร้างคอลลาเจนและซ่อมแซมผิว',
-        'สารฟลาโวนอยด์ช่วยหัวใจและหลอดเลือด',
-      ],
-      caution: 'กรดสูง อาจระคายกระเพาะ/กรดไหลย้อนในบางราย',
-    },
+    id: "watermelon",
+    name: "แตงโม",
+    emoji: "🍉",
+    nutrients: ["น้ำ", "ไลโคปีน"],
+    benefits: ["ให้ความสดชื่น", "บำรุงหัวใจ"],
   },
   {
-    id: 'guava',
-    name: 'ฝรั่ง',
-    cover: '/img/fruit/guava.jpg',
-    summary:
-      'วิตามิน C สูงมาก ไฟเบอร์สูง ช่วยน้ำตาลหลังอาหารและภูมิคุ้มกัน',
-    vitamins: ['วิตามิน C', 'ไฟเบอร์', 'ไลโคปีน (บางพันธุ์)'],
-    helps: ['เบาหวานชนิดที่ 2', 'ภูมิคุ้มกัน', 'ต้านอนุมูลอิสระ'],
-    details: {
-      nutrients: [
-        { k: 'พลังงาน', v: '68 kcal / 100g' },
-        { k: 'ไฟเบอร์', v: 'สูง' },
-        { k: 'วิตามิน C', v: 'สูงมาก' },
-      ],
-      conditions: [
-        'ไฟเบอร์ช่วยชะลอการดูดซึมน้ำตาลหลังอาหาร',
-        'วิตามิน C สูง สนับสนุนภูมิคุ้มกัน',
-      ],
-      caution: 'เมล็ดแข็ง เคี้ยวไม่ละเอียดอาจท้องอืดในบางราย',
-    },
+    id: "pineapple",
+    name: "สับปะรด",
+    emoji: "🍍",
+    nutrients: ["วิตามิน C", "แมงกานีส"],
+    benefits: ["ช่วยย่อยอาหาร", "ลดการอักเสบ"],
   },
   {
-    id: 'passion',
-    name: 'เสาวรส',
-    cover: '/img/fruit/passionfruit.jpg',
-    summary: 'โพลีฟีนอลสูง กลิ่นหอมเฉพาะตัว ช่วยต้านอนุมูลอิสระและการอักเสบ',
-    vitamins: ['วิตามิน C', 'วิตามิน A', 'โพลีฟีนอล'],
-    helps: ['ต้านอนุมูลอิสระ', 'ภูมิคุ้มกัน'],
-    details: {
-      nutrients: [
-        { k: 'พลังงาน', v: '97 kcal / 100g' },
-        { k: 'ไฟเบอร์', v: '10 g' },
-        { k: 'วิตามิน A/C', v: 'เด่น' },
-      ],
-      conditions: ['สนับสนุนต้านอนุมูลอิสระ', 'ช่วยภูมิคุ้มกัน'],
-      caution: 'รสเปรี้ยวจัด; ผู้แพ้ละตินบางชนิดควรเลี่ยง',
-    },
+    id: "papaya",
+    name: "มะละกอ",
+    emoji: "🥭",
+    nutrients: ["วิตามิน A", "เอนไซม์ปาเปน"],
+    benefits: ["ช่วยระบบขับถ่าย", "บำรุงสายตา"],
   },
-]
+  {
+    id: "mango",
+    name: "มะม่วง",
+    emoji: "🥭",
+    nutrients: ["วิตามิน A", "ไฟเบอร์"],
+    benefits: ["บำรุงสายตา", "ช่วยการย่อยอาหาร"],
+  },
+  {
+    id: "grape",
+    name: "องุ่น",
+    emoji: "🍇",
+    nutrients: ["เรสเวอราทรอล", "วิตามิน K"],
+    benefits: ["ชะลอความเสื่อม", "บำรุงหัวใจ"],
+  },
+  {
+    id: "guava",
+    name: "ฝรั่ง",
+    emoji: "🍈",
+    nutrients: ["วิตามิน C สูง", "ไฟเบอร์"],
+    benefits: ["เสริมภูมิคุ้มกัน", "ควบคุมน้ำตาล"],
+  },
+  {
+    id: "kiwi",
+    name: "กีวี",
+    emoji: "🥝",
+    nutrients: ["วิตามิน C สูง", "ไฟเบอร์"],
+    benefits: ["เสริมภูมิคุ้มกัน", "ช่วยระบบขับถ่าย"],
+  },
+  {
+    id: "dragonfruit",
+    name: "แก้วมังกร",
+    emoji: "🐉",
+    nutrients: ["ไฟเบอร์", "วิตามิน C"],
+    benefits: ["ควบคุมน้ำหนัก", "บำรุงลำไส้"],
+  },
+  {
+    id: "passionfruit",
+    name: "เสาวรส",
+    emoji: "🟣",
+    nutrients: ["วิตามิน A", "วิตามิน C", "ไฟเบอร์"],
+    benefits: ["บำรุงสายตา", "ช่วยการนอนหลับ", "ต้านอนุมูลอิสระ"],
+  },
+];
 
-function Chip({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-3 py-1 rounded-full border text-sm transition-all ${
-        active
-          ? 'bg-black text-white border-black shadow'
-          : 'bg-white hover:bg-neutral-100 border-neutral-300'
-      }`}
-    >
-      {children}
-    </button>
-  )
-}
+// --- ข้อเสียของการ "ไม่กิน" ผลไม้ (ไทม์ไลน์) ---
+const NO_FRUIT_CONS = [
+  {
+    title: "ขาดไฟเบอร์ ➜ ท้องผูก/เสี่ยงริดสีดวง",
+    detail: "ไฟเบอร์ช่วยการขับถ่ายและปริมาตรอุจจาระ",
+  },
+  {
+    title: "จุลินทรีย์ดีในลำไส้ลดลง",
+    detail: "พรีไบโอติกจากผลไม้ช่วยเลี้ยงจุลินทรีย์ที่ดี",
+  },
+  {
+    title: "วิตามิน & สารต้านอนุมูลอิสระต่ำ",
+    detail: "เพิ่มความเครียดออกซิเดชันภายในร่างกาย",
+  },
+  {
+    title: "ภูมิคุ้มกันอ่อนลง",
+    detail: "พลาดแหล่งวิตามิน C และไฟโตนิวเทรียนท์สำคัญ",
+  },
+  {
+    title: "ผิวหมอง/แผลหายช้า",
+    detail: "ขาดวิตามิน C และ A ที่ช่วยคอลลาเจนและผิวพรรณ",
+  },
+  {
+    title: "อยากของหวาน/พลังงานเกินง่าย",
+    detail: "ขาดไฟเบอร์ทำให้อิ่มช้า หิวบ่อย",
+  },
+  {
+    title: "สุขภาพหัวใจ/ความดันแย่ลง",
+    detail: "พลาดโพแทสเซียมและโพลีฟีนอลที่ดีต่อหลอดเลือด",
+  },
+  {
+    title: "คุมระดับน้ำตาลยากขึ้น",
+    detail: "ขาดไฟเบอร์ละลายน้ำที่ช่วยชะลอการดูดซึมน้ำตาล",
+  },
+  {
+    title: "เสี่ยงขาดน้ำทางอ้อม",
+    detail: "พลาดแหล่งน้ำจากผลไม้ (บางชนิดมีน้ำ >80%)",
+  },
+  {
+    title: "สมาธิ/ความจำถดถอย",
+    detail: "พลาดโพลีฟีนอลที่สนับสนุนสมองและการไหลเวียน",
+  },
+  {
+    title: "โภชนาการขาดความหลากหลาย",
+    detail: "สารอาหารรองจำนวนมากพบมากในผลไม้หลากสี",
+  },
+  {
+    title: "แนวโน้มพึ่งอาหารแปรรูปสูงขึ้น",
+    detail: "อาจได้รับโซเดียม/น้ำตาล/ไขมันทรานส์มากกว่า",
+  },
+];
 
-function Modal({ open, onClose, children }) {
-  if (!open) return null
-  return (
-    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative w-full sm:max-w-2xl bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-5 sm:p-6 mx-auto">
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 rounded-full border px-3 py-1 text-sm hover:bg-neutral-50"
-        >
-          ปิด
-        </button>
-        {children}
-      </div>
-    </div>
-  )
-}
+export default function FruitBenefitsPage() {
+  const [query, setQuery] = useState("");
 
-export default function FruitBenefitsSection() {
-  const [q, setQ] = useState('')
-  const [filters, setFilters] = useState([])
-  const [active, setActive] = useState(null) // ผลไม้ที่เปิด modal
-  const [compare, setCompare] = useState([])
-
-  const toggleFilter = (k) =>
-    setFilters((f) => (f.includes(k) ? f.filter((x) => x !== k) : [...f, k]))
+  useEffect(() => {
+    AOS.init({ duration: 700, once: true, easing: "ease-out-quart" });
+  }, []);
 
   const filtered = useMemo(() => {
-    return FRUITS.filter((f) => {
-      const byText =
-        !q || f.name.includes(q) || f.summary.toLowerCase().includes(q.toLowerCase())
-      const byCond =
-        filters.length === 0 || filters.every((c) => f.helps.includes(c))
-      return byText && byCond
-    })
-  }, [q, filters])
-
-  const toggleCompare = (id) => {
-    setCompare((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id].slice(0, 4)
-    )
-  }
-
-  const compareItems = FRUITS.filter((f) => compare.includes(f.id))
+    return FRUITS.filter((f) =>
+      (f.name + f.benefits.join(" ") + f.nutrients.join(" "))
+        .toLowerCase()
+        .includes(query.toLowerCase())
+    );
+  }, [query]);
 
   return (
-    <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12" id="fruit-benefits">
-      <div className="flex flex-col gap-4 sm:gap-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <h2 className="text-2xl sm:text-3xl font-semibold">ประโยชน์ของผลไม้</h2>
+    <div className="container my-4" data-aos="fade-in">
+      <h1 className="text-center mb-2" data-aos="fade-down">
+        ประโยชน์ของผลไม้
+      </h1>
+      <p
+        className="alert alert-warning text-center"
+        data-aos="zoom-in"
+        data-aos-delay="100"
+      >
+        *ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำทางการแพทย์*
+      </p>
 
-          <div className="flex gap-2">
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="ค้นหา: ชื่อผลไม้ / ประโยชน์"
-              className="w-full md:w-80 border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
-            />
-          </div>
-        </div>
+      {/* ค้นหา */}
+      <div className="mb-3" data-aos="fade-up" data-aos-delay="150">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="ค้นหาชื่อผลไม้ / สารอาหาร / สรรพคุณ..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
 
-        <div className="flex flex-wrap gap-2">
-          {CONDITIONS.map((c) => (
-            <Chip key={c} active={filters.includes(c)} onClick={() => toggleFilter(c)}>
-              {c}
-            </Chip>
-          ))}
-          {filters.length > 0 && (
-            <button
-              onClick={() => setFilters([])}
-              className="text-sm underline underline-offset-4"
-            >
-              ล้างตัวกรอง
-            </button>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((f) => (
-            <article
-              key={f.id}
-              className="group rounded-2xl border shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow"
-            >
-              <div className="aspect-[16/10] bg-neutral-100 overflow-hidden">
-                <img
-                  className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform"
-                  src={f.cover}
-                  alt={f.name}
-                  loading="lazy"
-                />
+      {/* การ์ดผลไม้ */}
+      <div className="row g-3">
+        {filtered.map((fruit, idx) => (
+          <div
+            className="col-12 col-sm-6 col-md-4"
+            key={fruit.id}
+            data-aos="fade-up"
+            data-aos-delay={(idx % 6) * 50}
+          >
+            <div className="card h-100 shadow-sm overflow-hidden rounded-4">
+              <div className="px-3 pt-3 d-flex align-items-center gap-2">
+                <span style={{ fontSize: "2.6rem", lineHeight: 1 }} aria-hidden>
+                  {fruit.emoji}
+                </span>
+                <h5 className="card-title mb-0">{fruit.name}</h5>
               </div>
-              <div className="p-5 flex flex-col gap-3">
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-lg font-semibold">{f.name}</h3>
-                  <button
-                    onClick={() => toggleCompare(f.id)}
-                    className={`text-xs px-2.5 py-1 rounded-full border transition ${
-                      compare.includes(f.id)
-                        ? 'bg-black text-white border-black'
-                        : 'bg-white hover:bg-neutral-100'
-                    }`}
-                  >
-                    {compare.includes(f.id) ? 'นำออก' : 'เปรียบเทียบ'}
-                  </button>
-                </div>
-
-                <p className="text-sm text-neutral-700">{f.summary}</p>
-
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {f.vitamins.map((v) => (
-                    <span
-                      key={v}
-                      className="text-xs px-2 py-1 rounded-full border border-neutral-300"
-                    >
-                      {v}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  {f.helps.map((h) => (
-                    <span key={h} className="text-xs text-neutral-600">• {h}</span>
-                  ))}
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <button
-                    onClick={() => setActive(f)}
-                    className="px-4 py-2 rounded-xl border bg-white hover:bg-neutral-100"
-                  >
-                    ดูรายละเอียด
-                  </button>
-                </div>
+              <div className="card-body pt-2 pb-2">
+                <p className="card-subtitle text-muted mb-0">
+                  สารอาหารหลัก: {fruit.nutrients.join(", ")}
+                </p>
               </div>
-            </article>
-          ))}
-        </div>
-
-        {compareItems.length > 0 && (
-          <div className="mt-4 border rounded-2xl p-4">
-            <div className="flex items-center justify-between">
-              <h4 className="font-semibold">รายการเปรียบเทียบ</h4>
-              <button className="text-sm underline" onClick={() => setCompare([])}>
-                ล้างทั้งหมด
-              </button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
-              {compareItems.map((f) => (
-                <div key={f.id} className="rounded-xl border p-3">
-                  <div className="flex items-center gap-3">
-                    <img src={f.cover} alt={f.name} className="w-12 h-12 rounded object-cover" />
-                    <div>
-                      <div className="font-medium">{f.name}</div>
-                      <div className="text-xs text-neutral-600">
-                        {f.vitamins.join(' • ')}
-                      </div>
-                    </div>
-                  </div>
-                  <ul className="list-disc pl-5 mt-2 text-sm text-neutral-700 space-y-1">
-                    {f.details.conditions.slice(0, 3).map((c, i) => (
-                      <li key={i}>{c}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+              <ul className="list-group list-group-flush">
+                {fruit.benefits.map((b, i) => (
+                  <li key={i} className="list-group-item">
+                    <span className="me-2">✅</span>
+                    {b}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
+        ))}
+        {filtered.length === 0 && (
+          <p className="text-center text-muted" data-aos="fade-in">
+            ไม่พบผลไม้ที่ตรงเงื่อนไข
+          </p>
         )}
       </div>
 
-      {/* Modal รายละเอียด */}
-      <Modal open={!!active} onClose={() => setActive(null)}>
-        {active && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <img
-                src={active.cover}
-                alt={active.name}
-                className="w-14 h-14 rounded-xl object-cover"
-              />
-              <div>
-                <div className="text-xl font-semibold">{active.name}</div>
-                <div className="text-sm text-neutral-600">{active.summary}</div>
-              </div>
-            </div>
+      {/* ============================= */}
+      {/* ส่วนใหม่: ข้อเสียของการ "ไม่กิน" ผลไม้ */}
+      {/* ============================= */}
+      <section id="no-fruit-cons" className="my-5" data-aos="fade-up">
+        <h2 className="mb-3 d-flex align-items-center gap-2">
+          <span>🚫</span> ข้อเสียของการไม่กินผลไม้
+        </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="rounded-xl border p-4">
-                <div className="font-medium mb-2">สารอาหารเด่น</div>
-                <ul className="text-sm space-y-1">
-                  {active.details.nutrients.map((n, i) => (
-                    <li key={i} className="flex justify-between gap-3">
-                      <span className="text-neutral-700">{n.k}</span>
-                      <span className="font-medium">{n.v}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="rounded-xl border p-4">
-                <div className="font-medium mb-2">ช่วยชะลอ/สนับสนุน</div>
-                <ul className="list-disc pl-5 text-sm space-y-1">
-                  {active.details.conditions.map((c, i) => (
-                    <li key={i}>{c}</li>
-                  ))}
-                </ul>
+        <div className="timeline">
+          {NO_FRUIT_CONS.map((item, i) => (
+            <div
+              className="timeline-item"
+              key={i}
+              data-aos="fade-right"
+              data-aos-delay={i * 70}
+            >
+              <div className="timeline-dot" />
+              <div className="timeline-content card shadow-sm">
+                <div className="card-body py-3">
+                  <div className="fw-semibold">{item.title}</div>
+                  <div className="text-muted small">{item.detail}</div>
+                </div>
               </div>
             </div>
+          ))}
+        </div>
+      </section>
 
-            <div className="rounded-xl border p-4 bg-amber-50/60">
-              <div className="font-medium mb-1">ข้อควรระวัง</div>
-              <p className="text-sm text-neutral-800">{active.details.caution}</p>
-              <p className="text-xs text-neutral-600 mt-2">
-                * ข้อมูลเป็นภาพรวมเพื่อการศึกษา ไม่ใช่คำแนะนำทางการแพทย์
-              </p>
-            </div>
-          </div>
-        )}
-      </Modal>
-    </section>
-  )
+      {/* สไตล์ของไทม์ไลน์ + เอฟเฟกต์ */}
+      <style jsx>{`
+        .timeline {
+          position: relative;
+          margin-left: 28px;
+          padding-left: 22px;
+        }
+        .timeline::before {
+          content: "";
+          position: absolute;
+          left: 8px;
+          top: 0;
+          bottom: 0;
+          width: 4px;
+          background: linear-gradient(180deg, #22c55e, #16a34a);
+          border-radius: 2px;
+          filter: drop-shadow(0 0 6px rgba(22, 163, 74, 0.25));
+        }
+        .timeline-item {
+          position: relative;
+          margin: 18px 0;
+        }
+        .timeline-dot {
+          position: absolute;
+          left: -2px;
+          top: 10px;
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: radial-gradient(circle at 30% 30%, #f43f5e, #ef4444);
+          border: 4px solid #fff;
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+          animation: pulse 2.2s infinite;
+        }
+        .timeline-content {
+          margin-left: 36px;
+          border-radius: 14px;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .timeline-content:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 20px rgba(2, 6, 23, 0.12) !important;
+        }
+        @keyframes pulse {
+          0% {
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45);
+          }
+          70% {
+            box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+          }
+        }
+        @media (prefers-color-scheme: dark) {
+          .timeline::before {
+            opacity: 0.7;
+          }
+        }
+      `}</style>
+    </div>
+  );
 }
