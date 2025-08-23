@@ -4,13 +4,21 @@ import { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js"; // ใช้สำหรับ Collapse
+import "bootstrap-icons/font/bootstrap-icons.css"; // ❌ ตัด bootstrap.bundle ออก
 
 export default function About() {
   const [copied, setCopied] = useState(false);
   const [showSkills, setShowSkills] = useState(false); // toggle ทักษะโปรแกรม
   const [showCodeSkills, setShowCodeSkills] = useState(false); // toggle ทักษะโค้ด
+
+  // state สำหรับ “รายละเอียด” (แทน Bootstrap Collapse)
+  const [openDesign, setOpenDesign] = useState({});
+  const [openCode, setOpenCode] = useState({});
+
+  const toggleDesign = (id) =>
+    setOpenDesign((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleCode = (id) =>
+    setOpenCode((prev) => ({ ...prev, [id]: !prev[id] }));
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true, easing: "ease-out" });
@@ -229,7 +237,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* SKILLS (กดแล้วกระจาย) */}
+      {/* SKILLS (Design Tools) */}
       <section className="mb-5" data-aos="fade-up">
         <div className="card glass-card rounded-4">
           <div className="card-body p-4">
@@ -279,14 +287,16 @@ export default function About() {
 
                   <button
                     className="btn btn-sm btn-outline-dark mt-3"
-                    data-bs-toggle="collapse"
-                    data-bs-target={`#skill-${s.id}`}
-                    aria-expanded="false"
+                    onClick={() => toggleDesign(s.id)}
+                    aria-expanded={!!openDesign[s.id]}
                     aria-controls={`skill-${s.id}`}
                   >
                     รายละเอียด
                   </button>
-                  <div id={`skill-${s.id}`} className="collapse mt-3">
+                  <div
+                    id={`skill-${s.id}`}
+                    className={`details mt-3 ${openDesign[s.id] ? "show" : ""}`}
+                  >
                     <ul className="small text-secondary m-0 ps-3">
                       {s.points.map((p, i) => (
                         <li key={i} className="mb-1">
@@ -302,7 +312,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* CODE SKILLS (กดแล้วกระจาย) */}
+      {/* CODE SKILLS */}
       <section className="mb-5" data-aos="fade-up">
         <div className="card glass-card rounded-4">
           <div className="card-body p-4">
@@ -356,14 +366,16 @@ export default function About() {
 
                   <button
                     className="btn btn-sm btn-outline-dark mt-3"
-                    data-bs-toggle="collapse"
-                    data-bs-target={`#code-skill-${s.id}`}
-                    aria-expanded="false"
+                    onClick={() => toggleCode(s.id)}
+                    aria-expanded={!!openCode[s.id]}
                     aria-controls={`code-skill-${s.id}`}
                   >
                     รายละเอียด
                   </button>
-                  <div id={`code-skill-${s.id}`} className="collapse mt-3">
+                  <div
+                    id={`code-skill-${s.id}`}
+                    className={`details mt-3 ${openCode[s.id] ? "show" : ""}`}
+                  >
                     <ul className="small text-secondary m-0 ps-3">
                       {s.points.map((p, i) => (
                         <li key={i} className="mb-1">
@@ -673,7 +685,7 @@ export default function About() {
           outline-color: color-mix(in srgb, var(--brand-ig) 24%, transparent);
         }
 
-        /* Skills fan-out (ใช้ร่วมกันทั้ง 2 section) */
+        /* Skills grid (ใช้ร่วมกัน) */
         .skills-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -719,6 +731,18 @@ export default function About() {
           object-fit: contain;
         }
 
+        /* รายละเอียดแบบ React (แทน Collapse) */
+        .details {
+          max-height: 0;
+          overflow: hidden;
+          opacity: 0;
+          transition: max-height 0.3s ease, opacity 0.25s ease;
+        }
+        .details.show {
+          max-height: 600px;
+          opacity: 1;
+        }
+
         /* แถบสีตามแบรนด์ (Design Tools) */
         .skill-card.canva .progress-bar {
           background: var(--canva);
@@ -740,19 +764,12 @@ export default function About() {
         .skill-card.css .progress-bar {
           background: #1572b6;
         }
-        .skill-card.js .progress-bar {
-          background: #f7df1e;
-          color: #000;
-        }
         .skill-card.react .progress-bar {
           background: #61dafb;
           color: #000;
         }
         .skill-card.next .progress-bar {
           background: #000;
-        }
-        .skill-card.node .progress-bar {
-          background: #3c873a;
         }
         .skill-card.php .progress-bar {
           background: #777bb4;
