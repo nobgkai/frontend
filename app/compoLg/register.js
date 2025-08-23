@@ -43,7 +43,7 @@ export default function Register() {
         timer: 3000,
         timerProgressBar: true,
       }).then(() => {
-        router.push("");
+        router.push("/login1"); // เปลี่ยนเส้นทางไปยังหน้าเข้าสู่ระบบ
       });
     } catch (err) {
       alert("เกิดข้อผิดพลาด: " + err.message);
@@ -58,7 +58,7 @@ export default function Register() {
         style={{ minHeight: "80vh", marginTop: "120px" }}
       >
         <div className="col-lg-7">
-          <div className="p-4 border rounded-4 shadow-sm bg-white">
+          <div className="p-4 border rounded-4 shadow-sm bg-swhite">
             <h2 className="text-center mb-4" style={{ color: "#333" }}>
               สมัครสมาชิก
             </h2>
