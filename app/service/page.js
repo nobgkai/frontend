@@ -5,97 +5,35 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
+// ❌ เอาออก: import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 const SERVICES = [
-  {
-    id: "health",
-    icon: "bi-heart-pulse-fill",
-    color: "text-danger",
-    title: "คำปรึกษาด้านสุขภาพจากผลไม้",
-    brief:
-      "แนะนำการเลือกผลไม้ให้เหมาะกับร่างกาย ไลฟ์สไตล์ และโรคประจำตัว เพื่อผลลัพธ์ที่ยั่งยืน",
-    details: [
-      "วางแผนการทานผลไม้รายสัปดาห์ (Macro/Micro nutrients ครบถ้วน)",
-      "คู่มือจับคู่ผลไม้กับมื้ออาหาร: ก่อน/หลังออกกำลังกาย, ลดน้ำหนัก, คุมน้ำตาล",
-      "หลีกเลี่ยงการทานซ้ำซ้อนของน้ำตาลผลไม้ (Fructose) แบบรู้ปริมาณ",
-      "คำเตือน/ข้อควรระวังสำหรับผู้ป่วยเบาหวาน/ความดัน/โรคไต",
-    ],
-  },
-  {
-    id: "delivery",
-    icon: "bi-truck",
-    color: "text-success",
-    title: "จัดส่งคำปรึกษา & คอร์สออนไลน์",
-    brief:
-      "ไม่ต้องเดินทาง เราส่งความรู้ให้ถึงที่ ทั้งเอกสาร วิดีโอสั้น และไลฟ์ Q&A รายสัปดาห์",
-    details: [
-      "สรุปเอกสาร PDF อินโฟกราฟิกอ่านง่าย อัปเดตทุกเดือน",
-      "วิดีโอสั้น (5–10 นาที) เข้าใจเร็ว พร้อมตัวอย่างเมนูจริง",
-      "ชั่วโมง Q&A แบบกลุ่มสัปดาห์ละครั้ง (Live/Recorded)",
-      "แจ้งเตือนเป้าหมายรายวันผ่านอีเมลหรือโซเชียลที่คุณใช้",
-    ],
-  },
-  {
-    id: "family",
-    icon: "bi-people-fill",
-    color: "text-primary",
-    title: "ดูแลแบบครบวงจร (รายบุคคล/ครอบครัว)",
-    brief:
-      "ที่ปรึกษาส่วนตัว ติดตามผลต่อเนื่อง ปรับแผนตามพฤติกรรมจริง ไม่ทิ้งระยะ",
-    details: [
-      "ประเมินพฤติกรรมการกินผลไม้ของสมาชิกในบ้านแบบรายคน",
-      "ออกแบบแผนรวม: ตารางซื้อ/เตรียม/เก็บผลไม้ให้สดนาน",
-      "เช็คลิสต์ติดตู้เย็น + สูตรน้ำผลไม้/สลัดที่ทำซ้ำได้",
-      "รีวิวผลทุก 2 สัปดาห์พร้อมคำแนะนำปรับละเอียด",
-    ],
-  },
-  {
-    id: "articles",
-    icon: "bi-journal-text",
-    color: "text-warning",
-    title: "บทความความรู้ & คลังเนื้อหา",
-    brief:
-      "อธิบายเชิงวิทยาศาสตร์ แต่เล่าให้เข้าใจง่าย ใช้ได้จริงในชีวิตประจำวัน",
-    details: [
-      "Fact-check อ้างอิงงานวิจัยสั้นๆ พร้อมสรุป Key Takeaways",
-      "หัวข้อยอดนิยม: ไฟเบอร์ vs น้ำตาล, กินผลไม้ตอนไหนดีที่สุด",
-      "Mini-guide เลือกผลไม้ตามฤดูกาล + เก็บรักษายังไงให้ไม่ช้ำ",
-      "อัปเดตเทรนด์โภชนาการประจำเดือน (อ่าน 3 นาที)",
-    ],
-  },
-  {
-    id: "workshop",
-    icon: "bi-mortarboard-fill",
-    color: "text-info",
-    title: "เวิร์กช็อป & อบรม",
-    brief: "เรียนแบบลงมือทำ: ชิม เปรียบเทียบ ปรับเมนูจริง พร้อมแผนกลับไปทำต่อ",
-    details: [
-      "เวิร์กช็อป 90 นาที: จัดจานผลไม้สมดุล 3 รูปแบบ",
-      "คลาสองค์กร/โรงเรียน พร้อมสไลด์และเอกสารประกอบ",
-      "กิจกรรมชิมตาบอด (Blind tasting) ฝึกแยกรส/ความหวาน",
-      "มอบหมายงานเล็ก ๆ 7 วัน + กลุ่มติดตามผล",
-    ],
-  },
+  // ... (รายการ SERVICES เดิมของคุณ ไม่ต้องแก้)
 ];
 
 export default function Service() {
   useEffect(() => {
     AOS.init({ duration: 900, once: true, easing: "ease-out-cubic" });
+
+    // ✅ โหลด Bootstrap JS เฉพาะบน client
+    import("bootstrap/dist/js/bootstrap.bundle.min.js").catch(() => {});
   }, []);
 
   const [openId, setOpenId] = useState(null);
   const toggle = (id) => {
     setOpenId((prev) => (prev === id ? null : id));
-    setTimeout(() => {
-      const el = document.getElementById(`card-${id}`);
-      el?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 50);
+    // ✅ guard ป้องกัน SSR แม้โค้ดนี้รันเฉพาะตอนกดบน client อยู่แล้ว
+    if (typeof document !== "undefined") {
+      setTimeout(() => {
+        const el = document.getElementById(`card-${id}`);
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 50);
+    }
   };
 
   return (
     <main className="container-fluid px-0">
-      {/* HERO: 2 สไลด์, ข้อความกึ่งกลาง, ไม่มีปุ่ม */}
+      {/* HERO */}
       <section className="mb-5" style={{ marginTop: 60 }}>
         <div
           id="heroCarousel"
@@ -119,7 +57,6 @@ export default function Service() {
           </div>
 
           <div className="carousel-inner">
-            {/* Slide 1 */}
             <div className="carousel-item active">
               <img
                 src="/img/fruit/bg1.jpg"
@@ -127,7 +64,7 @@ export default function Service() {
                 alt="ผลไม้เพื่อสุขภาพ"
                 loading="eager"
               />
-              <div className="hero-overlay"></div>
+              <div className="hero-overlay" />
               <div className="carousel-caption caption-middle">
                 <h1 className="fw-bold cap">“กินให้ฉลาด ไม่ใช่กินให้เยอะ”</h1>
                 <p className="lead cap">
@@ -137,7 +74,6 @@ export default function Service() {
               </div>
             </div>
 
-            {/* Slide 2 */}
             <div className="carousel-item">
               <img
                 src="/img/fruit/bg2.jpg"
@@ -145,7 +81,7 @@ export default function Service() {
                 alt="คำปรึกษาแบบตัวต่อตัว"
                 loading="lazy"
               />
-              <div className="hero-overlay"></div>
+              <div className="hero-overlay" />
               <div className="carousel-caption caption-middle">
                 <h1 className="fw-bold cap">ความรู้สั้น ๆ ใช้ได้จริง</h1>
                 <p className="lead cap">
@@ -156,7 +92,6 @@ export default function Service() {
             </div>
           </div>
 
-          {/* Controls */}
           <button
             className="carousel-control-prev"
             type="button"
@@ -191,7 +126,7 @@ export default function Service() {
               >
                 <div className="p-4 border rounded-4 shadow-sm bg-light h-100 d-flex flex-column service-card">
                   <div className="mb-3">
-                    <i className={`bi ${s.icon} ${s.color} fs-1`}></i>
+                    <i className={`bi ${s.icon} ${s.color} fs-1`} />
                   </div>
                   <h4 className="mb-2">{s.title}</h4>
                   <p className="text-muted mb-3">{s.brief}</p>
@@ -237,7 +172,6 @@ export default function Service() {
       >
         <h3 className="mb-3">🎥 วิดีโอแนะนำของเรา</h3>
 
-        {/* วิดีโอกึ่งกลาง + ขอบมน */}
         <div style={{ display: "flex", justifyContent: "center" }}>
           <div
             className="ratio ratio-16x9 shadow"
@@ -253,8 +187,8 @@ export default function Service() {
               src="https://www.youtube.com/embed/t9QA2-RnwzM"
               title="YouTube video"
               allowFullScreen
-              style={{ border: "0" }}
-            ></iframe>
+              style={{ border: 0 }}
+            />
           </div>
         </div>
 
@@ -267,7 +201,6 @@ export default function Service() {
 
       {/* STYLE */}
       <style jsx>{`
-        /* HERO เต็ม viewport (หัก navbar 60px) */
         .hero {
           height: 80vh;
           min-height: 540px;
@@ -277,7 +210,7 @@ export default function Service() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center; /* 5092x2000 กลางพอดี */
+          object-position: center;
           filter: saturate(1.05);
         }
         .hero-overlay {
@@ -291,9 +224,6 @@ export default function Service() {
           );
           pointer-events: none;
         }
-
-        /* Bootstrap ใส่ bottom/left/right ให้ .carousel-caption มาเอง
-           เรา override ใน .caption-middle เพื่อให้อยู่กึ่งกลางจริง ๆ */
         .carousel-caption {
           text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
         }
@@ -301,20 +231,15 @@ export default function Service() {
         .carousel-caption p {
           color: #fff;
         }
-
         .caption-middle {
           position: absolute;
           top: 50%;
           left: 50%;
-          right: auto;
-          bottom: auto; /* kill bottom ของ Bootstrap */
           transform: translate(-50%, -50%);
           width: min(100%, 1100px);
           padding: 0 2rem;
           text-align: center;
         }
-
-        /* เอฟเฟกต์ข้อความค่อย ๆ โผล่ */
         .carousel-caption .cap {
           opacity: 0;
           transform: translateY(12px);
@@ -331,7 +256,6 @@ export default function Service() {
           transition-delay: 0.26s;
         }
 
-        /* การ์ดบริการ */
         .service-card {
           transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -340,7 +264,6 @@ export default function Service() {
           box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
         }
 
-        /* แผงรายละเอียด */
         .expand-panel {
           max-height: 0;
           overflow: hidden;
@@ -352,7 +275,6 @@ export default function Service() {
           opacity: 1;
         }
 
-        /* CTA */
         .cta-strip {
           background: radial-gradient(
               1200px 400px at 50% -20%,
