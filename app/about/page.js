@@ -401,7 +401,7 @@ export default function About() {
         <div className="col-10 col-md-3" data-aos="zoom-in">
           <a
             className="text-decoration-none"
-            href="https://instagram.com/yourusername"
+            href="https://www.instagram.com/kaivitongat/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="ไปที่ Instagram"
@@ -410,7 +410,7 @@ export default function About() {
               <div className="card-body p-4 text-center">
                 <i className="bi bi-instagram fs-1 mb-2 brand-ig" />
                 <h6 className="mb-1 text-dark">Instagram</h6>
-                <p className="text-secondary small m-0">@yourusername</p>
+                <p className="text-secondary small m-0">@NobgKai</p>
               </div>
             </div>
           </a>
@@ -424,7 +424,7 @@ export default function About() {
         >
           <a
             className="text-decoration-none"
-            href="https://facebook.com/yourusername"
+            href="https://www.facebook.com/Nobgkai"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="ไปที่ Facebook"
@@ -433,7 +433,7 @@ export default function About() {
               <div className="card-body p-4 text-center">
                 <i className="bi bi-facebook fs-1 mb-2 brand-fb" />
                 <h6 className="mb-1 text-dark">Facebook</h6>
-                <p className="text-secondary small m-0">/yourusername</p>
+                <p className="text-secondary small m-0">คนธรรมดา หมี</p>
               </div>
             </div>
           </a>

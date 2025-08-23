@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import "./navar.css";
+import "./navar.css"; // ถ้ามีสไตล์อื่นใช้ไฟล์นี้ต่อได้ ไม่ต้องแก้
 
-// ✅ ฟังก์ชันอ่าน token จาก localStorage/sessionStorage
 function readToken() {
   if (typeof window === "undefined") return null;
   return (
@@ -15,15 +14,13 @@ function readToken() {
 
 export default function Navbar() {
   const router = useRouter();
-  const pathname = usePathname(); // เส้นทางปัจจุบัน
+  const pathname = usePathname();
   const [token, setToken] = useState(null);
 
-  // ✅ โหลด token เมื่อโหลดหน้า และเมื่อเปลี่ยนเส้นทาง
   useEffect(() => {
     setToken(readToken());
   }, [pathname]);
 
-  // ✅ รองรับกรณีเปลี่ยน token จากอีกแท็บ
   useEffect(() => {
     const onStorage = () => setToken(readToken());
     window.addEventListener("storage", onStorage);
@@ -38,7 +35,7 @@ export default function Navbar() {
   }, [router]);
 
   const handleSearch = (e) => {
-    e.preventDefault(); // ป้องกันรีเฟรช
+    e.preventDefault();
     const q = new FormData(e.currentTarget).get("q")?.toString().trim();
     if (q) router.push(`/search?q=${encodeURIComponent(q)}`);
   };
@@ -74,7 +71,6 @@ export default function Navbar() {
                 About
               </Link>
             </li>
-
             <li className="nav-item dropdown">
               <a
                 href="#"
@@ -112,25 +108,29 @@ export default function Navbar() {
               </ul>
             </li>
           </ul>
-          <div className="d-flex align-item-center ms-auto grap-2">
-            {/* 🔎 Search */}
-            <form className="d-flex" role="search" onSubmit={handleSearch}>
+
+          {/* 🔎 Search + 🔐 Auth */}
+          <div className="ms-0 ms-lg-auto d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-3">
+            <form
+              className="d-flex w-100 w-lg-auto"
+              role="search"
+              onSubmit={handleSearch}
+            >
               <input
                 name="q"
-                className="form-control me-2"
+                className="form-control me-2  search-input"
                 type="search"
                 placeholder="Search"
                 aria-label="Search"
               />
-              <button className="btn custom-btn" type="submit">
+              <button className="btn custom-btn flex-shrink-0" type="submit">
                 Search
               </button>
             </form>
 
-            {/* 🔐 Auth */}
             {token ? (
               <button
-                className="btn btn-danger ms-lg-3  w-lg-auto mt-3 mt-lg-0"
+                className="btn btn-danger ms-lg-3 w-100 w-lg-auto mt-2 mt-lg-0"
                 type="button"
                 onClick={handleSignOut}
               >
@@ -139,7 +139,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login1"
-                className="btn custom-btn-login ms-lg-3  w-lg-auto mt-3 mt-lg-0"
+                className="btn custom-btn-login ms-lg-3 w-100 w-lg-auto mt-2 mt-lg-0"
               >
                 Login
               </Link>
@@ -147,6 +147,26 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* ✅ CSS-in-JSX: ไม่ต้องสร้างไฟล์ CSS เพิ่ม */}
+      <style jsx>{`
+        .search-input {
+          flex: 1 1 auto;
+          width: auto;
+        }
+        /* ≥576px: ยาวขึ้นนิด */
+        @media (min-width: 476px) {
+          .search-input {
+            min-width: 320px;
+          }
+        }
+        /* ≥992px: ยาวขึ้นชัด */
+        @media (min-width: 992px) {
+          .search-input {
+            min-width: 480px;
+          } /* เปลี่ยน 520/560 ได้ตามใจ */
+        }
+      `}</style>
     </nav>
   );
 }
