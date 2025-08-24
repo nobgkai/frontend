@@ -15,12 +15,13 @@ export default function Edit11({ user, onClose, onSave }) {
     fullname: user?.fullname ?? "",
     lastname: user?.lastname ?? "",
     username: user?.username ?? "",
-    password: "", // ✅ ใส่ว่างไว้ ถ้าไม่กรอกจะไม่อัปเดต
+    password: "",
     address: user?.address ?? "",
     sex: user?.sex ?? "",
-    birthday: user?.birthday ? user.birthday.slice(0, 10) : "", // รองรับรูปแบบ ISO
+    birthday: user?.birthday ? String(user.birthday).slice(0, 10) : "",
   });
 
+  // 🔒 ล็อกสกอลล์พื้นหลังระหว่างเปิดโมดัล + sync user
   useEffect(() => {
     setFormData({
       id: user?.id ?? "",
@@ -33,6 +34,17 @@ export default function Edit11({ user, onClose, onSave }) {
       sex: user?.sex ?? "",
       birthday: user?.birthday ? String(user.birthday).slice(0, 10) : "",
     });
+
+    const originalOverflow =
+      typeof document !== "undefined" ? document.body.style.overflow : "";
+    if (typeof document !== "undefined") {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      if (typeof document !== "undefined") {
+        document.body.style.overflow = originalOverflow || "";
+      }
+    };
   }, [user]);
 
   const handleChange = (e) => {
@@ -43,15 +55,17 @@ export default function Edit11({ user, onClose, onSave }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ ตรวจวันเกิดไม่ให้เป็นอนาคต
+    // ✅ ตรวจวันเกิดไม่ให้เป็นอนาคต (ตัดเวลาออกให้เทียบเป็นวันล้วน)
     if (formData.birthday) {
       const today = new Date();
+      today.setHours(0, 0, 0, 0);
       const bd = new Date(formData.birthday);
+      bd.setHours(0, 0, 0, 0);
       if (bd > today) {
         Swal.fire({
           icon: "warning",
           title: "วันเกิดไม่ถูกต้อง",
-          text: "กรุณาเลือกวันที่ที่ผ่านมาแล้ว",
+          text: "กรุณาเลือกวันที่ผ่านมาแล้ว",
         });
         return;
       }
@@ -59,7 +73,6 @@ export default function Edit11({ user, onClose, onSave }) {
 
     setSubmitting(true);
     try {
-      // ✅ สร้าง payload โดยตัดฟิลด์ว่าง/ไม่จำเป็น
       const payload = {
         id: formData.id,
         firstname: (formData.firstname || "").trim(),
@@ -96,7 +109,6 @@ export default function Edit11({ user, onClose, onSave }) {
         throw new Error(updated?.message || text || "อัปเดตไม่สำเร็จ");
       }
 
-      // แจ้ง parent อัปเดตตาราง
       onSave(
         updated && typeof updated === "object"
           ? updated
@@ -111,7 +123,7 @@ export default function Edit11({ user, onClose, onSave }) {
         timerProgressBar: true,
       });
 
-      onClose();
+      onClose?.();
     } catch (err) {
       await Swal.fire({
         icon: "error",
@@ -124,8 +136,9 @@ export default function Edit11({ user, onClose, onSave }) {
     }
   };
 
+  // ปิดเมื่อคลิกด้านนอกการ์ด (กันกรณีคลิกภายในไม่ปิด)
   const closeOnBackdrop = (e) => {
-    if (e.target.id === "modalOverlay") onClose?.();
+    if (e.target === e.currentTarget) onClose?.();
   };
 
   return (
@@ -136,8 +149,13 @@ export default function Edit11({ user, onClose, onSave }) {
       aria-modal="true"
       role="dialog"
     >
-      <form onSubmit={handleSubmit} className="card">
-        <div className="card-header">
+      <form
+        onSubmit={handleSubmit}
+        className="card"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* header sticky */}
+        <div className="card-header sticky-top">
           <h3 className="title">แก้ไขข้อมูลผู้ใช้</h3>
           <button
             type="button"
@@ -149,141 +167,153 @@ export default function Edit11({ user, onClose, onSave }) {
           </button>
         </div>
 
-        {/* ID (อ่านอย่างเดียว) */}
-        <div className="mb-3">
-          <label className="form-label">รหัสผู้ใช้ (ID)</label>
-          <input
-            name="id"
-            type="text"
-            value={formData.id}
-            disabled
-            className="form-control readonly"
-          />
-        </div>
-
-        {/* คำนำหน้า */}
-        <div className="mb-3">
-          <label className="form-label">คำนำหน้า</label>
-          <select
-            name="firstname"
-            value={formData.firstname ?? ""}
-            onChange={handleChange}
-            required
-            className="form-select"
-          >
-            <option value="">-- เลือกคำนำหน้า --</option>
-            <option value="นาย">นาย</option>
-            <option value="นาง">นาง</option>
-            <option value="นางสาว">นางสาว</option>
-          </select>
-        </div>
-
-        {/* ชื่อ / นามสกุล / ชื่อเล่น */}
-        <div className="grid-2">
+        {/* เนื้อหาที่เลื่อนได้ */}
+        <div className="card-content">
+          {/* ID (อ่านอย่างเดียว) */}
           <div className="mb-3">
-            <label className="form-label">ชื่อ</label>
+            <label className="form-label">รหัสผู้ใช้ (ID)</label>
             <input
-              name="fullname"
+              name="id"
               type="text"
-              value={formData.fullname ?? ""}
-              onChange={handleChange}
-              required
-              className="form-control"
-              placeholder="ชื่อจริง"
+              value={formData.id}
+              disabled
+              className="form-control readonly"
             />
           </div>
+
+          {/* คำนำหน้า */}
           <div className="mb-3">
-            <label className="form-label">นามสกุล</label>
-            <input
-              name="lastname"
-              type="text"
-              value={formData.lastname ?? ""}
-              onChange={handleChange}
-              required
-              className="form-control"
-              placeholder="นามสกุล"
-            />
-          </div>
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">ชื่อเล่น</label>
-          <input
-            name="username"
-            type="text"
-            value={formData.username ?? ""}
-            onChange={handleChange}
-            required
-            className="form-control"
-            placeholder="ชื่อเล่น / Username"
-          />
-        </div>
-
-        {/* รหัสผ่าน (ไม่กรอก = ไม่เปลี่ยน) */}
-        <div className="mb-3">
-          <label className="form-label">รหัสผ่าน (เว้นว่างหากไม่เปลี่ยน)</label>
-          <div className="password-row">
-            <input
-              name="password"
-              type={showPassword ? "text" : "password"}
-              value={formData.password}
-              onChange={handleChange}
-              className="form-control"
-              placeholder="••••••••"
-            />
-            <button
-              type="button"
-              className="btn btn-outline"
-              onClick={() => setShowPassword((s) => !s)}
-              aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
-            >
-              {showPassword ? "ซ่อน" : "แสดง"}
-            </button>
-          </div>
-        </div>
-
-        {/* ที่อยู่ */}
-        <div className="mb-3">
-          <label className="form-label">ที่อยู่</label>
-          <textarea
-            name="address"
-            value={formData.address ?? ""}
-            onChange={handleChange}
-            rows={3}
-            className="form-control"
-            placeholder="บ้านเลขที่ / ถนน / ตำบล / อำเภอ / จังหวัด / รหัสไปรษณีย์"
-          />
-        </div>
-
-        {/* เพศ / วันเกิด */}
-        <div className="grid-2">
-          <div className="mb-3">
-            <label className="form-label">เพศ</label>
+            <label className="form-label">คำนำหน้า</label>
             <select
-              name="sex"
-              value={formData.sex ?? ""}
+              name="firstname"
+              value={formData.firstname ?? ""}
               onChange={handleChange}
+              required
               className="form-select"
             >
-              <option value="">-- เลือกเพศ --</option>
-              <option value="ชาย">ชาย</option>
-              <option value="หญิง">หญิง</option>
-              <option value="อื่นๆ">อื่นๆ</option>
+              <option value="">-- เลือกคำนำหน้า --</option>
+              <option value="นาย">นาย</option>
+              <option value="นาง">นาง</option>
+              <option value="นางสาว">นางสาว</option>
             </select>
           </div>
+
+          {/* ชื่อ / นามสกุล */}
+          <div className="grid">
+            <div className="mb-3">
+              <label className="form-label">ชื่อ</label>
+              <input
+                name="fullname"
+                type="text"
+                value={formData.fullname ?? ""}
+                onChange={handleChange}
+                required
+                className="form-control"
+                placeholder="ชื่อจริง"
+                autoComplete="given-name"
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">นามสกุล</label>
+              <input
+                name="lastname"
+                type="text"
+                value={formData.lastname ?? ""}
+                onChange={handleChange}
+                required
+                className="form-control"
+                placeholder="นามสกุล"
+                autoComplete="family-name"
+              />
+            </div>
+          </div>
+
+          {/* ชื่อเล่น / Username */}
           <div className="mb-3">
-            <label className="form-label">วันเกิด</label>
+            <label className="form-label">ชื่อเล่น</label>
             <input
-              name="birthday"
-              type="date"
-              value={formData.birthday ?? ""}
+              name="username"
+              type="text"
+              value={formData.username ?? ""}
               onChange={handleChange}
+              required
               className="form-control"
+              placeholder="ชื่อเล่น / Username"
+              autoComplete="username"
             />
+          </div>
+
+          {/* รหัสผ่าน (ไม่กรอก = ไม่เปลี่ยน) */}
+          <div className="mb-3">
+            <label className="form-label">
+              รหัสผ่าน (เว้นว่างหากไม่เปลี่ยน)
+            </label>
+            <div className="password-row">
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="••••••••"
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => setShowPassword((s) => !s)}
+                aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
+              >
+                {showPassword ? "ซ่อน" : "แสดง"}
+              </button>
+            </div>
+          </div>
+
+          {/* ที่อยู่ */}
+          <div className="mb-3">
+            <label className="form-label">ที่อยู่</label>
+            <textarea
+              name="address"
+              value={formData.address ?? ""}
+              onChange={handleChange}
+              rows={3}
+              className="form-control"
+              placeholder="บ้านเลขที่ / ถนน / ตำบล / อำเภอ / จังหวัด / รหัสไปรษณีย์"
+            />
+          </div>
+
+          {/* เพศ / วันเกิด */}
+          <div className="grid">
+            <div className="mb-3">
+              <label className="form-label">เพศ</label>
+              <select
+                name="sex"
+                value={formData.sex ?? ""}
+                onChange={handleChange}
+                className="form-select"
+              >
+                <option value="">-- เลือกเพศ --</option>
+                <option value="ชาย">ชาย</option>
+                <option value="หญิง">หญิง</option>
+                <option value="อื่นๆ">อื่นๆ</option>
+              </select>
+            </div>
+            <div className="mb-3">
+              <label className="form-label">วันเกิด</label>
+              <input
+                name="birthday"
+                type="date"
+                value={formData.birthday ?? ""}
+                onChange={handleChange}
+                className="form-control"
+                autoComplete="bday"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="actions">
+        {/* ปุ่มล่าง sticky */}
+        <div className="actions sticky-bottom">
           <button
             type="button"
             className="btn btn-ghost"
@@ -302,7 +332,7 @@ export default function Edit11({ user, onClose, onSave }) {
         </div>
       </form>
 
-      {/* ✨ มินิมอลสไตล์ + เอฟเฟกต์ภายในคอมโพเนนต์ */}
+      {/* ✨ มินิมอล + Responsive + Sticky header/footer + Scrollable content */}
       <style jsx>{`
         .modal-overlay {
           position: fixed;
@@ -313,42 +343,60 @@ export default function Edit11({ user, onClose, onSave }) {
           backdrop-filter: blur(6px);
           z-index: 1000;
           animation: fadeIn 160ms ease-out;
-          padding: 16px;
+          padding: clamp(8px, 2vw, 16px);
         }
         .card {
-          width: 100%;
-          max-width: 720px;
+          width: clamp(320px, 92vw, 720px);
+          /* สูงไม่เกินหน้าจอ เลื่อนส่วน content ด้านในแทน */
+          max-height: min(86vh, 880px);
           background: #ffffff;
           border-radius: 16px;
           box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-          padding: 18px 18px 14px;
+          display: grid;
+          grid-template-rows: auto 1fr auto; /* header | content | footer */
           transform: translateY(6px) scale(0.98);
           animation: popIn 200ms ease-out forwards;
+          overflow: hidden; /* บังคับมุมโค้งและซ่อนสกอลล์บาร์ส่วนเกิน */
         }
         .card-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 6px 4px 10px;
-          margin-bottom: 8px;
+          padding: 10px 14px;
           border-bottom: 1px solid #eee;
+          background: #fff;
+          z-index: 1;
         }
         .title {
           margin: 0;
-          font-size: 18px;
+          font-size: clamp(16px, 2.4vw, 18px);
           font-weight: 700;
           letter-spacing: 0.3px;
         }
-        .grid-2 {
+        .card-content {
+          padding: 12px 14px;
+          overflow: auto; /* ให้สกอลล์เฉพาะเนื้อหา */
+          -webkit-overflow-scrolling: touch;
+        }
+        .sticky-top {
+          position: sticky;
+          top: 0;
+        }
+        .sticky-bottom {
+          position: sticky;
+          bottom: 0;
+          background: #fff;
+          border-top: 1px solid #eee;
+          z-index: 1;
+        }
+
+        /* Grid ฟิลด์ปรับอัตโนมัติ */
+        .grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
           gap: 12px;
         }
-        @media (max-width: 640px) {
-          .grid-2 {
-            grid-template-columns: 1fr;
-          }
-        }
+
         .mb-3 {
           margin-bottom: 12px;
         }
@@ -382,27 +430,31 @@ export default function Edit11({ user, onClose, onSave }) {
           color: #6b7280;
           cursor: not-allowed;
         }
+
         .password-row {
           display: grid;
           grid-template-columns: 1fr auto;
           gap: 8px;
           align-items: center;
         }
+
         .actions {
           display: flex;
           justify-content: flex-end;
           gap: 8px;
-          margin-top: 6px;
+          padding: 10px 14px;
         }
+
         .btn {
           border: 1px solid transparent;
           border-radius: 12px;
-          padding: 8px 14px;
+          padding: 9px 14px;
           font-size: 14px;
           line-height: 1.2;
           transition: transform 0.08s ease, box-shadow 0.18s ease,
             background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
           cursor: pointer;
+          touch-action: manipulation;
         }
         .btn:active {
           transform: scale(0.98);
@@ -432,6 +484,29 @@ export default function Edit11({ user, onClose, onSave }) {
         .btn-ghost:hover {
           background: #f3f4f6;
           color: #111827;
+        }
+
+        /* ปรับบนจอเล็ก: ลด padding และฟอนต์เล็กลงนิดหน่อย */
+        @media (max-width: 480px) {
+          .card-header {
+            padding: 8px 10px;
+          }
+          .card-content {
+            padding: 10px;
+          }
+          .actions {
+            padding: 8px 10px;
+          }
+          .btn {
+            padding: 8px 12px;
+            font-size: 13px;
+          }
+          .form-control,
+          .form-select,
+          textarea.form-control {
+            padding: 9px 11px;
+            font-size: 13.5px;
+          }
         }
 
         @keyframes fadeIn {
