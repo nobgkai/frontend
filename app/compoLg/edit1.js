@@ -31,11 +31,9 @@ export default function Edit11({ user, onClose, onSave }) {
       firstname: user.firstname ?? "",
       lastname: user.lastname ?? "",
       username: user.username ?? "",
-      password: "",
       gender: user.gender ?? "",
       birthdate: user.birthdate ? String(user.birthdate).slice(0, 10) : "",
       address: user.address ?? "",
-      role: user.role ?? "user",
       status: user.status ?? "active",
     });
 
@@ -54,28 +52,24 @@ export default function Edit11({ user, onClose, onSave }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setSubmitting(true);
+
     try {
+      // ✅ payload สำหรับ backend (ไม่มี id / ไม่มี password)
       const payload = {
-        id: formData.id,
-        prefix: formData.prefix || null,
-        firstname: formData.firstname.trim(),
-        lastname: formData.lastname.trim(),
-        username: formData.username.trim(),
+        prefix: formData.prefix,
+        firstname: formData.firstname,
+        lastname: formData.lastname,
         gender: formData.gender || null,
         birthdate: formData.birthdate || null,
-        address: formData.address?.trim() || null,
-        role: formData.role,
+        address: formData.address || null,
         status: formData.status,
       };
 
-      if (formData.password && formData.password.trim() !== "") {
-        payload.password = formData.password.trim();
-      }
+      // ส่ง username เฉพาะตอนเปลี่ยน
 
-      // 🔥 เรียกผ่าน adminApi เท่านั้น
-      const updated = await updateUser(payload);
+      // ⭐ จุดสำคัญที่สุด (id ต้องอยู่ตรงนี้)
+      await updateUser(formData.id, payload);
 
       onSave({ ...user, ...payload });
 
@@ -201,7 +195,6 @@ export default function Edit11({ user, onClose, onSave }) {
               type="text"
               value={formData.username ?? ""}
               onChange={handleChange}
-              required
               className="form-control"
               placeholder="ชื่อเล่น / Username"
               autoComplete="username"
