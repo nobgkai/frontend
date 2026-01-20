@@ -4,7 +4,7 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    const res = await fetch("https://api-user-jet.vercel.app/api/users", {
+    const res = await fetch("https://002-backend.vercel.app/api/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

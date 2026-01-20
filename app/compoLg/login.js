@@ -66,10 +66,12 @@ export default function Login() {
     setSubmitting(true);
 
     try {
-      const res = await fetch("/api/login", {
+      const apiBaseUrl = "https://002-backend.vercel.app";
+      const res = await fetch(`${apiBaseUrl}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
+        mode: "cors",
       });
 
       const text = await res.text();

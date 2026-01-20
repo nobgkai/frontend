@@ -32,12 +32,14 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      const res = await fetch("/api/register2", {
+      const apiBaseUrl = "https://002-backend.vercel.app";
+      const res = await fetch(`${apiBaseUrl}/api/register2`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
+        mode: "cors",
       });
 
       let data = {};

@@ -4,7 +4,7 @@ export async function PUT(req, ctx) {
   const { id } = await ctx.params;
   const payload = await req.json();
 
-  const url = `https://api-user-jet.vercel.app/api/users/${encodeURIComponent(
+  const url = `https://002-backend.vercel.app/api/users/${encodeURIComponent(
     id
   )}`;
   const headers = { "Content-Type": "application/json" };

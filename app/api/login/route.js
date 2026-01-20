@@ -1,7 +1,7 @@
 // app/api/login/route.js
 import { NextResponse } from "next/server";
 
-const BACKEND_LOGIN_API = "https://api-user-jet.vercel.app/api/login";
+const BACKEND_LOGIN_API = "https://002-backend.vercel.app/api/login";
 
 export async function POST(req) {
   try {

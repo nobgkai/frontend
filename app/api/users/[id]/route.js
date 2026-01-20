@@ -14,7 +14,7 @@ export async function PUT(req, { params }) {
   delete body.username;
   delete body.password;
 
-  const r = await fetch(`https://api-user-jet.vercel.app/api/users/${id}`, {
+  const r = await fetch(`https://002-backend.vercel.app/api/users/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export async function DELETE(req, { params }) {
   if (!id) return NextResponse.json({ message: "NO_ID" }, { status: 400 });
 
   // ❌ DELETE ห้ามมี body
-  const r = await fetch(`https://api-user-jet.vercel.app/api/users/${id}`, {
+  const r = await fetch(`https://002-backend.vercel.app/api/users/${id}`, {
     method: "DELETE",
     headers: { Authorization: auth },
   });
