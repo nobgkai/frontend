@@ -33,7 +33,7 @@ export default function Register() {
 
     try {
       const apiBaseUrl = "https://002-backend.vercel.app";
-      const res = await fetch(`${apiBaseUrl}/api/register2`, {
+      const res = await fetch(`${apiBaseUrl}/api/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
