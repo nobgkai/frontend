@@ -38,7 +38,11 @@ export default function Register() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          role: "user",
+          status: "active",
+        }),
         mode: "cors",
       });
 
