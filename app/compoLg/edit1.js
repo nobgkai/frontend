@@ -64,6 +64,7 @@ export default function Edit11({ user, onClose, onSave }) {
         birthdate: formData.birthdate || null,
         address: formData.address || null,
         status: formData.status,
+        username: formData.username, // ✅ Send username to backend
       };
 
       // ส่ง username เฉพาะตอนเปลี่ยน

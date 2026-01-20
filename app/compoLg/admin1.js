@@ -59,7 +59,7 @@ export default function Admin1() {
     if (!token) return router.replace("/login1");
 
     try {
-      const updated = await updateUser(updatedUser);
+      const updated = await updateUser(updatedUser.id, updatedUser);
       setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
       setEditingUser(null);
       alert("แก้ไขข้อมูลเรียบร้อย");
