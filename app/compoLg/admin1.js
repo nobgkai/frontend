@@ -18,7 +18,10 @@ export default function Admin1() {
 
   const loadUsers = async () => {
     try {
-      const data = await fetchUsers();
+      const token = getToken();
+      const data = await fetchUsers(token); ///เพิ่มให้รับ token และรอส่ง token
+
+      console.log("USERS FROM API:", data);
       setItems(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("โหลดข้อมูลล้มเหลว:", error?.message || error);

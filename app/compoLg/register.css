@@ -50,14 +50,28 @@ textarea:focus {
   box-shadow: none !important;
 }
 
-/* ปุ่ม Register */
+/* ปุ่มสมัครสมาชิก */
 .btn-effect {
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  background-color: #212121; /* สีติดเลย */
+  color: #ffffff;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* กดแล้วเด้งนิดเดียว (ไม่ใช่ hover) */
+.btn-effect:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* (ถ้าเคยมี hover ให้ลบทิ้ง หรือ override) */
 .btn-effect:hover {
-  background-color: #333;
-  transform: translateY(-1px);
+  background-color: #212121; /* เหมือนเดิม */
+  color: #fff;
 }
 
 /* ป้องกัน select จากการขยาย */

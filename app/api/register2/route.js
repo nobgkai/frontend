@@ -1,24 +1,29 @@
-// api.js
-export async function registerUser(data) {
+import { NextResponse } from "next/server";
+
+export async function POST(req) {
   try {
-    const res = await fetch(
-      "https://backend-nextjs-virid.vercel.app/api/users",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
+    const body = await req.json();
+
+    const res = await fetch("https://api-user-jet.vercel.app/api/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    const text = await res.text();
+
+    return new NextResponse(text, {
+      status: res.status,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (err) {
+    return NextResponse.json(
+      { message: err.message || "Server error" },
+      { status: 500 }
     );
-
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.message || "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์");
-    }
-
-    return await res.json();
-  } catch (error) {
-    throw error;
   }
 }

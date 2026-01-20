@@ -2,31 +2,29 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import { registerUser } from "../api/register2/route"; // ปรับเส้นทางให้ตรงกับที่คุณเก็บฟังก์ชันนี้
 import "./register.css";
 
 export default function Register() {
   const router = useRouter();
   const [formData, setFormData] = useState({
+    prefix: "",
     firstname: "",
-    fullname: "",
     lastname: "",
     username: "",
     password: "",
     address: "",
-    sex: "",
-    birthday: "",
+    gender: "",
+    birthdate: "",
     agree: false,
   });
 
   const handleChange = (e) => {
-    const { id, value, name, type, checked } = e.target;
+    const { id, name, value, type, checked } = e.target;
     const field = name || id;
-    const val = type === "checkbox" ? checked : value;
 
     setFormData((prev) => ({
       ...prev,
-      [field]: val,
+      [field]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -34,23 +32,38 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      await registerUser(formData);
+      const res = await fetch("/api/register2", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      let data = {};
+      try {
+        data = await res.json();
+      } catch {
+        // ถ้า response ไม่มี body
+      }
+
+      if (!res.ok) {
+        throw new Error(data.message || "สมัครไม่สำเร็จ");
+      }
+
       await Swal.fire({
         icon: "success",
         title: "สมัครสมาชิกสำเร็จ!",
         text: "คุณสามารถเข้าสู่ระบบได้ทันที",
-        confirmButtonText: "ตกลง",
-        timer: 3000,
-        timerProgressBar: true,
-      }).then(() => {
-        router.push("/login1"); // เปลี่ยนเส้นทางไปยังหน้าเข้าสู่ระบบ
+        timer: 2000,
+        showConfirmButton: false,
       });
+
+      router.push("/login1");
     } catch (err) {
-      alert("เกิดข้อผิดพลาด: " + err.message);
-      console.error(err);
+      Swal.fire("ผิดพลาด", err.message, "error");
     }
   };
-
   return (
     <div className="container mt-5">
       <div
@@ -64,7 +77,6 @@ export default function Register() {
             </h2>
 
             <form onSubmit={handleSubmit}>
-              {/* โค้ดฟอร์มเหมือนที่คุณส่งมา */}
               {/* Username */}
               <div className="mb-3">
                 <label htmlFor="username" className="form-label text-dark">
@@ -74,11 +86,9 @@ export default function Register() {
                   type="text"
                   className="form-control"
                   id="username"
-                  placeholder="ชื่อผู้ใช้"
                   required
                   value={formData.username}
                   onChange={handleChange}
-                  style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 />
               </div>
 
@@ -91,11 +101,9 @@ export default function Register() {
                   type="password"
                   className="form-control"
                   id="password"
-                  placeholder="รหัสผ่าน"
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 />
               </div>
 
@@ -105,12 +113,11 @@ export default function Register() {
                   คำนำหน้าชื่อ
                 </label>
                 <select
-                  id="firstname"
+                  id="prefix"
                   className="form-select"
                   required
-                  value={formData.firstname}
+                  value={formData.prefix}
                   onChange={handleChange}
-                  style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 >
                   <option value="">-- เลือก --</option>
                   <option value="นาย">นาย</option>
@@ -121,18 +128,16 @@ export default function Register() {
 
               {/* ชื่อ */}
               <div className="mb-3">
-                <label htmlFor="fullname" className="form-label text-dark">
+                <label htmlFor="firstname" className="form-label text-dark">
                   ชื่อ
                 </label>
                 <input
                   type="text"
                   className="form-control"
-                  id="fullname"
-                  placeholder="ชื่อจริง"
+                  id="firstname"
                   required
-                  value={formData.fullname}
+                  value={formData.firstname}
                   onChange={handleChange}
-                  style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 />
               </div>
 
@@ -145,11 +150,9 @@ export default function Register() {
                   type="text"
                   className="form-control"
                   id="lastname"
-                  placeholder="นามสกุล"
                   required
                   value={formData.lastname}
                   onChange={handleChange}
-                  style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 />
               </div>
 
@@ -162,12 +165,10 @@ export default function Register() {
                   id="address"
                   className="form-control"
                   rows="3"
-                  placeholder="ที่อยู่ปัจจุบัน"
                   required
                   value={formData.address}
                   onChange={handleChange}
-                  style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
-                ></textarea>
+                />
               </div>
 
               {/* เพศ */}
@@ -177,16 +178,11 @@ export default function Register() {
                   <input
                     className="form-check-input"
                     type="radio"
-                    name="sex"
+                    name="gender"
                     id="male"
-                    value="ผู้ชาย"
-                    checked={formData.sex === "ผู้ชาย"}
-                    onChange={() => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        sex: prev.sex === "ผู้ชาย" ? "" : "ผู้ชาย",
-                      }));
-                    }}
+                    value="ชาย"
+                    checked={formData.gender === "ชาย"}
+                    onChange={handleChange}
                   />
                   <label className="form-check-label" htmlFor="male">
                     ชาย
@@ -196,16 +192,11 @@ export default function Register() {
                   <input
                     className="form-check-input"
                     type="radio"
-                    name="sex"
+                    name="gender"
                     id="female"
-                    value="ผู้หญิง"
-                    checked={formData.sex === "ผู้หญิง"}
-                    onChange={() => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        sex: prev.sex === "ผู้หญิง" ? "" : "ผู้หญิง",
-                      }));
-                    }}
+                    value="หญิง"
+                    checked={formData.gender === "หญิง"}
+                    onChange={handleChange}
                   />
                   <label className="form-check-label" htmlFor="female">
                     หญิง
@@ -221,11 +212,10 @@ export default function Register() {
                 <input
                   type="date"
                   className="form-control"
-                  id="birthday"
+                  id="birthdate"
                   required
-                  value={formData.birthday}
+                  value={formData.birthdate}
                   onChange={handleChange}
-                  style={{ backgroundColor: "#f9f9f9", borderColor: "#ccc" }}
                 />
               </div>
 
@@ -235,26 +225,15 @@ export default function Register() {
                   className="form-check-input"
                   type="checkbox"
                   id="agree"
-                  required
                   checked={formData.agree}
                   onChange={handleChange}
                 />
-                <label className="form-check-label text-dark " htmlFor="agree">
+                <label className="form-check-label text-dark" htmlFor="agree">
                   ฉันยอมรับเงื่อนไขและข้อตกลงการใช้งาน
                 </label>
               </div>
 
-              {/* ปุ่มสมัคร */}
-              <button
-                type="submit"
-                className="btn w-100 btn-effect"
-                style={{
-                  backgroundColor: "#212121",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  letterSpacing: "0.5px",
-                }}
-              >
+              <button type="submit" className="btn w-100 btn-effect">
                 สมัครสมาชิก
               </button>
             </form>

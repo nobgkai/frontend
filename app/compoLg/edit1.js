@@ -1,49 +1,49 @@
 "use client";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-
-const API_BASE = "https://backend-nextjs-virid.vercel.app";
-const USERS_API = `${API_BASE}/api/users`;
+import { updateUser } from "@/lib/addminApi";
 
 export default function Edit11({ user, onClose, onSave }) {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
-    id: user?.id ?? "",
-    firstname: user?.firstname ?? "",
-    fullname: user?.fullname ?? "",
-    lastname: user?.lastname ?? "",
-    username: user?.username ?? "",
+    id: "",
+    prefix: "",
+    firstname: "",
+    lastname: "",
+    username: "",
     password: "",
-    address: user?.address ?? "",
-    sex: user?.sex ?? "",
-    birthday: user?.birthday ? String(user.birthday).slice(0, 10) : "",
+    gender: "",
+    birthdate: "",
+    address: "",
+    role: "",
+    status: "",
   });
 
   // 🔒 ล็อกสกอลล์พื้นหลังระหว่างเปิดโมดัล + sync user
   useEffect(() => {
+    if (!user) return;
+
     setFormData({
-      id: user?.id ?? "",
-      firstname: user?.firstname ?? "",
-      fullname: user?.fullname ?? "",
-      lastname: user?.lastname ?? "",
-      username: user?.username ?? "",
+      id: user.id ?? "",
+      prefix: user.prefix ?? "",
+      firstname: user.firstname ?? "",
+      lastname: user.lastname ?? "",
+      username: user.username ?? "",
       password: "",
-      address: user?.address ?? "",
-      sex: user?.sex ?? "",
-      birthday: user?.birthday ? String(user.birthday).slice(0, 10) : "",
+      gender: user.gender ?? "",
+      birthdate: user.birthdate ? String(user.birthdate).slice(0, 10) : "",
+      address: user.address ?? "",
+      role: user.role ?? "user",
+      status: user.status ?? "active",
     });
 
-    const originalOverflow =
-      typeof document !== "undefined" ? document.body.style.overflow : "";
-    if (typeof document !== "undefined") {
-      document.body.style.overflow = "hidden";
-    }
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     return () => {
-      if (typeof document !== "undefined") {
-        document.body.style.overflow = originalOverflow || "";
-      }
+      document.body.style.overflow = originalOverflow;
     };
   }, [user]);
 
@@ -55,72 +55,35 @@ export default function Edit11({ user, onClose, onSave }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ ตรวจวันเกิดไม่ให้เป็นอนาคต (ตัดเวลาออกให้เทียบเป็นวันล้วน)
-    if (formData.birthday) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const bd = new Date(formData.birthday);
-      bd.setHours(0, 0, 0, 0);
-      if (bd > today) {
-        Swal.fire({
-          icon: "warning",
-          title: "วันเกิดไม่ถูกต้อง",
-          text: "กรุณาเลือกวันที่ผ่านมาแล้ว",
-        });
-        return;
-      }
-    }
-
     setSubmitting(true);
     try {
       const payload = {
         id: formData.id,
-        firstname: (formData.firstname || "").trim(),
-        fullname: (formData.fullname || "").trim(),
-        lastname: (formData.lastname || "").trim(),
-        username: (formData.username || "").trim(),
+        prefix: formData.prefix || null,
+        firstname: formData.firstname.trim(),
+        lastname: formData.lastname.trim(),
+        username: formData.username.trim(),
+        gender: formData.gender || null,
+        birthdate: formData.birthdate || null,
         address: formData.address?.trim() || null,
-        sex: formData.sex || null,
-        birthday: formData.birthday || null,
+        role: formData.role,
+        status: formData.status,
       };
+
       if (formData.password && formData.password.trim() !== "") {
         payload.password = formData.password.trim();
       }
 
-      const res = await fetch(USERS_API, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      // 🔥 เรียกผ่าน adminApi เท่านั้น
+      const updated = await updateUser(payload);
 
-      const text = await res.text();
-      const updated = (() => {
-        try {
-          return JSON.parse(text);
-        } catch {
-          return null;
-        }
-      })();
-
-      if (!res.ok) {
-        throw new Error(updated?.message || text || "อัปเดตไม่สำเร็จ");
-      }
-
-      onSave(
-        updated && typeof updated === "object"
-          ? updated
-          : { ...user, ...payload }
-      );
+      onSave({ ...user, ...payload });
 
       await Swal.fire({
         icon: "success",
-        title: "<h3>แก้ไขข้อมูลเรียบร้อย</h3>",
+        title: "แก้ไขข้อมูลเรียบร้อย",
+        timer: 1400,
         showConfirmButton: false,
-        timer: 1600,
-        timerProgressBar: true,
       });
 
       onClose?.();
@@ -128,8 +91,10 @@ export default function Edit11({ user, onClose, onSave }) {
       await Swal.fire({
         icon: "error",
         title: "เกิดข้อผิดพลาด",
-        text: err?.message || "อัปเดตไม่สำเร็จ",
-        confirmButtonText: "ตกลง",
+        text:
+          err.message === "NO_TOKEN"
+            ? "กรุณา login ใหม่"
+            : err.message || "อัปเดตไม่สำเร็จ",
       });
     } finally {
       setSubmitting(false);
@@ -185,8 +150,8 @@ export default function Edit11({ user, onClose, onSave }) {
           <div className="mb-3">
             <label className="form-label">คำนำหน้า</label>
             <select
-              name="firstname"
-              value={formData.firstname ?? ""}
+              name="prefix"
+              value={formData.prefix ?? ""}
               onChange={handleChange}
               required
               className="form-select"
@@ -203,9 +168,9 @@ export default function Edit11({ user, onClose, onSave }) {
             <div className="mb-3">
               <label className="form-label">ชื่อ</label>
               <input
-                name="fullname"
+                name="firstname"
                 type="text"
-                value={formData.fullname ?? ""}
+                value={formData.firstname ?? ""}
                 onChange={handleChange}
                 required
                 className="form-control"
@@ -287,8 +252,8 @@ export default function Edit11({ user, onClose, onSave }) {
             <div className="mb-3">
               <label className="form-label">เพศ</label>
               <select
-                name="sex"
-                value={formData.sex ?? ""}
+                name="gender"
+                value={formData.gender ?? ""}
                 onChange={handleChange}
                 className="form-select"
               >
@@ -301,9 +266,9 @@ export default function Edit11({ user, onClose, onSave }) {
             <div className="mb-3">
               <label className="form-label">วันเกิด</label>
               <input
-                name="birthday"
+                name="birthdate"
                 type="date"
-                value={formData.birthday ?? ""}
+                value={formData.birthdate ?? ""}
                 onChange={handleChange}
                 className="form-control"
                 autoComplete="bday"
